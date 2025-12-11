@@ -120,7 +120,7 @@ export default function SequentialPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 p-4 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 p-4 pb-48">
       <div className="max-w-md mx-auto pt-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
@@ -183,7 +183,7 @@ export default function SequentialPage() {
         </div>
 
         {/* Controls */}
-        <div className="space-y-3 fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-blue-50 to-transparent dark:from-slate-950 dark:to-transparent max-w-md mx-auto pointer-events-none z-50">
+        <div className="space-y-3 fixed bottom-[60px] left-0 right-0 p-4 bg-gradient-to-t from-blue-50 to-transparent dark:from-slate-950 dark:to-transparent max-w-md mx-auto pointer-events-none z-40">
           {!submitted ? (
             <Button onClick={handleSubmit} disabled={!selectedAnswer} className="w-full pointer-events-auto" size="lg">
               提交答案
