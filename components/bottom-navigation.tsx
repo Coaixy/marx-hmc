@@ -13,22 +13,22 @@ const navigationItems = [
   },
   {
     label: "顺序",
-    href: "/sequential",
+    href: "/sequential.html",
     icon: BookOpen,
   },
   {
     label: "随机",
-    href: "/random",
+    href: "/random.html",
     icon: Shuffle,
   },
   {
     label: "考试",
-    href: "/exam",
+    href: "/exam.html",
     icon: ClipboardList,
   },
   {
     label: "错题",
-    href: "/errors",
+    href: "/errors.html",
     icon: AlertCircle,
   },
 ]
