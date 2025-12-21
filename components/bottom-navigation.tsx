@@ -5,6 +5,9 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Home, BookOpen, Shuffle, ClipboardList, AlertCircle } from "lucide-react"
 
+const isDev = process.env.NODE_ENV === "development"
+const suffix = isDev ? "" : ".html"
+
 const navigationItems = [
   {
     label: "首页",
@@ -13,22 +16,22 @@ const navigationItems = [
   },
   {
     label: "顺序",
-    href: "/sequential.html",
+    href: `/sequential${suffix}`,
     icon: BookOpen,
   },
   {
     label: "随机",
-    href: "/random.html",
+    href: `/random${suffix}`,
     icon: Shuffle,
   },
   {
     label: "考试",
-    href: "/exam.html",
+    href: `/exam${suffix}`,
     icon: ClipboardList,
   },
   {
     label: "错题",
-    href: "/errors.html",
+    href: `/errors${suffix}`,
     icon: AlertCircle,
   },
 ]

@@ -9,18 +9,46 @@ import { getSequentialQuestion, getTotalQuestions } from "@/lib/question-utils"
 import { storage } from "@/lib/storage"
 import { ChevronLeft, ChevronRight, Home } from "lucide-react"
 import { AnswerSheet } from "@/components/answer-sheet"
+import { useSubject } from "@/components/subject-provider"
 
 export default function SequentialPage() {
-  const { single, multiple, trueFalse } = getTotalQuestions()
+  const { subjectId, subject } = useSubject()
+  const { single, multiple, trueFalse } = getTotalQuestions(subjectId)
   const [mode, setMode] = useState<"single" | "multiple" | "trueFalse">("single")
   const [questionIndex, setQuestionIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string>()
   const [submitted, setSubmitted] = useState(false)
   const [mounted, setMounted] = useState(false)
 
+  // Reset or load progress when subject changes
   useEffect(() => {
     setMounted(true)
-    const progress = storage.getProgress()
+    const progress = storage.getProgress(subjectId)
+    
+    // Default to 'single' if available, otherwise try others
+    let initialMode: "single" | "multiple" | "trueFalse" = "single"
+    if (single === 0) {
+      if (multiple > 0) initialMode = "multiple"
+      else if (trueFalse > 0) initialMode = "trueFalse"
+    }
+    setMode(initialMode)
+
+    if (initialMode === "single") {
+      setQuestionIndex(progress.singleIndex)
+    } else if (initialMode === "multiple") {
+      setQuestionIndex(progress.multipleIndex)
+    } else {
+      setQuestionIndex(progress.trueFalseIndex)
+    }
+    
+    // Reset state
+    setSelectedAnswer("")
+    setSubmitted(false)
+  }, [subjectId, single, multiple, trueFalse])
+
+  useEffect(() => {
+    if (!mounted) return
+    const progress = storage.getProgress(subjectId)
     if (mode === "single") {
       setQuestionIndex(progress.singleIndex)
     } else if (mode === "multiple") {
@@ -28,7 +56,9 @@ export default function SequentialPage() {
     } else {
       setQuestionIndex(progress.trueFalseIndex)
     }
-  }, [mode])
+    setSelectedAnswer("")
+    setSubmitted(false)
+  }, [mode, subjectId]) // Add subjectId to dep, though managed by above effect too
 
   const handleAnswerSelect = (option: string) => {
     if (submitted) return
@@ -47,7 +77,7 @@ export default function SequentialPage() {
     }
   }
 
-  const currentQuestion = getSequentialQuestion(mode, questionIndex)
+  const currentQuestion = getSequentialQuestion(subjectId, mode, questionIndex)
   const maxQuestions = mode === "single" ? single : mode === "multiple" ? multiple : trueFalse
 
   const handleSubmit = () => {
@@ -56,7 +86,7 @@ export default function SequentialPage() {
 
     const isCorrect = selectedAnswer === currentQuestion.答案
     if (!isCorrect) {
-      storage.addWrongAnswer({
+      storage.addWrongAnswer(subjectId, {
         id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9),
         questionIndex,
         type: mode,
@@ -74,7 +104,7 @@ export default function SequentialPage() {
       setSelectedAnswer("")
       setSubmitted(false)
 
-      const progress = storage.getProgress()
+      const progress = storage.getProgress(subjectId)
       if (mode === "single") {
         progress.singleIndex = Math.max(progress.singleIndex, questionIndex + 1)
       } else if (mode === "multiple") {
@@ -82,7 +112,7 @@ export default function SequentialPage() {
       } else {
         progress.trueFalseIndex = Math.max(progress.trueFalseIndex, questionIndex + 1)
       }
-      storage.setProgress(progress)
+      storage.setProgress(subjectId, progress)
     }
   }
 
@@ -112,7 +142,9 @@ export default function SequentialPage() {
             </Button>
           </Link>
           <Card className="p-6 text-center">
-            <p className="text-lg font-semibold text-muted-foreground">所有题目已完成</p>
+            <p className="text-lg font-semibold text-muted-foreground">
+              {maxQuestions === 0 ? "该题型暂无题目" : "所有题目已完成"}
+            </p>
           </Card>
         </div>
       </div>
@@ -130,7 +162,7 @@ export default function SequentialPage() {
             </Button>
           </Link>
           <div className="text-center">
-            <h1 className="font-semibold text-primary">顺序刷题</h1>
+            <h1 className="font-semibold text-primary">顺序刷题 - {subject?.name}</h1>
           </div>
           <AnswerSheet
             total={maxQuestions}
@@ -141,32 +173,38 @@ export default function SequentialPage() {
           />
         </div>
 
-        {/* Mode selector */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          <Button
-            variant={mode === "single" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setMode("single")}
-            className="flex-1"
-          >
-            单选题
-          </Button>
-          <Button
-            variant={mode === "multiple" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setMode("multiple")}
-            className="flex-1"
-          >
-            多选题
-          </Button>
-          <Button
-            variant={mode === "trueFalse" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setMode("trueFalse")}
-            className="flex-1"
-          >
-            判断题
-          </Button>
+        {/* Mode selector - hide if 0 questions */}
+        <div className="flex gap-2 mb-4 overflow-x-auto">
+          {single > 0 && (
+            <Button
+              variant={mode === "single" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMode("single")}
+              className="flex-1"
+            >
+              单选题
+            </Button>
+          )}
+          {multiple > 0 && (
+            <Button
+              variant={mode === "multiple" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMode("multiple")}
+              className="flex-1"
+            >
+              多选题
+            </Button>
+          )}
+          {trueFalse > 0 && (
+            <Button
+              variant={mode === "trueFalse" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMode("trueFalse")}
+              className="flex-1"
+            >
+              判断题
+            </Button>
+          )}
         </div>
 
         {/* Question */}

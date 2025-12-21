@@ -9,8 +9,11 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 const _notoChinese = Noto_Sans_SC({ subsets: ["latin"] })
 
+import { SubjectProvider } from "@/components/subject-provider"
+import { Toaster } from "@/components/ui/toaster"
+
 export const metadata: Metadata = {
-  title: "马原刷题助手",
+  title: "综合刷题助手",
   description: "高效学习，轻松备考",
   generator: "v0.app",
   icons: {
@@ -40,8 +43,11 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className={`font-sans antialiased`}>
-        {children}
-        <BottomNavigation />
+        <SubjectProvider>
+          {children}
+          <BottomNavigation />
+          <Toaster />
+        </SubjectProvider>
         <Analytics />
       </body>
     </html>

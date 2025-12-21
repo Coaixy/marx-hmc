@@ -35,5 +35,25 @@ export interface QuestionBank {
 }
 
 import questionsData from './question.json'
+import bioData from './bio.json'
 
-export const DEFAULT_QUESTION_BANK: QuestionBank = questionsData as QuestionBank
+export const SUBJECTS = {
+  marx: {
+    id: 'marx',
+    name: '马克思主义基本原理',
+    data: questionsData as QuestionBank
+  },
+  bio: {
+    id: 'bio',
+    name: '生物化学',
+    data: bioData as unknown as QuestionBank
+  }
+} as const
+
+export type SubjectId = keyof typeof SUBJECTS
+export const DEFAULT_SUBJECT: SubjectId = 'marx'
+
+export const getQuestionBank = (subjectId: string): QuestionBank => {
+  return SUBJECTS[subjectId as SubjectId]?.data || SUBJECTS.marx.data
+}
+

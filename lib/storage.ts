@@ -6,6 +6,7 @@ export interface AnswerRecord {
   correctAnswer: string
   isCorrect: boolean
   timestamp: number
+  subjectId?: string // Add subjectId to record
 }
 
 export interface ExamRecord {
@@ -14,6 +15,7 @@ export interface ExamRecord {
   correctAnswers: number
   accuracy: number
   timestamp: number
+  subjectId?: string
 }
 
 export interface StudyProgress {
@@ -23,84 +25,100 @@ export interface StudyProgress {
   lastUpdated: number
 }
 
+const getStorageKey = (baseKey: string, subjectId: string) => `${baseKey}_${subjectId}`
+
 const STORAGE_KEYS = {
   WRONG_ANSWERS: "wrong_answers",
   STUDY_PROGRESS: "study_progress",
   EXAM_RESULTS: "exam_results",
+  EXAM_RECORDS: "exam_records"
 }
 
 export const storage = {
   // Wrong answers management
-  getWrongAnswers: (): AnswerRecord[] => {
+  getWrongAnswers: (subjectId: string): AnswerRecord[] => {
     if (typeof window === "undefined") return []
-    const data = localStorage.getItem(STORAGE_KEYS.WRONG_ANSWERS)
+    const key = getStorageKey(STORAGE_KEYS.WRONG_ANSWERS, subjectId)
+    const data = localStorage.getItem(key)
     return data ? JSON.parse(data) : []
   },
 
-  addWrongAnswer: (record: AnswerRecord) => {
+  addWrongAnswer: (subjectId: string, record: AnswerRecord) => {
     if (typeof window === "undefined") return
-    const answers = storage.getWrongAnswers()
-    answers.push(record)
-    localStorage.setItem(STORAGE_KEYS.WRONG_ANSWERS, JSON.stringify(answers))
+    const answers = storage.getWrongAnswers(subjectId)
+    // Avoid duplicates if needed, or just push
+    answers.push({ ...record, subjectId })
+    const key = getStorageKey(STORAGE_KEYS.WRONG_ANSWERS, subjectId)
+    localStorage.setItem(key, JSON.stringify(answers))
   },
 
-  removeWrongAnswer: (id: string) => {
+  removeWrongAnswer: (subjectId: string, id: string) => {
     if (typeof window === "undefined") return
-    const answers = storage.getWrongAnswers()
+    const answers = storage.getWrongAnswers(subjectId)
     const filtered = answers.filter((a) => a.id !== id)
-    localStorage.setItem(STORAGE_KEYS.WRONG_ANSWERS, JSON.stringify(filtered))
+    const key = getStorageKey(STORAGE_KEYS.WRONG_ANSWERS, subjectId)
+    localStorage.setItem(key, JSON.stringify(filtered))
   },
 
-  clearWrongAnswers: () => {
+  clearWrongAnswers: (subjectId: string) => {
     if (typeof window === "undefined") return
-    localStorage.removeItem(STORAGE_KEYS.WRONG_ANSWERS)
+    const key = getStorageKey(STORAGE_KEYS.WRONG_ANSWERS, subjectId)
+    localStorage.removeItem(key)
   },
 
   // Study progress
-  getProgress: (): StudyProgress => {
+  getProgress: (subjectId: string): StudyProgress => {
     if (typeof window === "undefined") return { singleIndex: 0, multipleIndex: 0, trueFalseIndex: 0, lastUpdated: 0 }
-    const data = localStorage.getItem(STORAGE_KEYS.STUDY_PROGRESS)
+    const key = getStorageKey(STORAGE_KEYS.STUDY_PROGRESS, subjectId)
+    const data = localStorage.getItem(key)
     return data ? JSON.parse(data) : { singleIndex: 0, multipleIndex: 0, trueFalseIndex: 0, lastUpdated: Date.now() }
   },
 
-  setProgress: (progress: StudyProgress) => {
+  setProgress: (subjectId: string, progress: StudyProgress) => {
     if (typeof window === "undefined") return
-    localStorage.setItem(STORAGE_KEYS.STUDY_PROGRESS, JSON.stringify(progress))
+    const key = getStorageKey(STORAGE_KEYS.STUDY_PROGRESS, subjectId)
+    localStorage.setItem(key, JSON.stringify(progress))
   },
 
-  // Exam results
-  getExamResults: (): AnswerRecord[] => {
+  // Exam results (Current temporary exam result)
+  getExamResults: (subjectId: string): AnswerRecord[] => {
     if (typeof window === "undefined") return []
-    const data = localStorage.getItem(STORAGE_KEYS.EXAM_RESULTS)
+    const key = getStorageKey(STORAGE_KEYS.EXAM_RESULTS, subjectId)
+    const data = localStorage.getItem(key)
     return data ? JSON.parse(data) : []
   },
 
-  saveExamResults: (results: AnswerRecord[]) => {
+  saveExamResults: (subjectId: string, results: AnswerRecord[]) => {
     if (typeof window === "undefined") return
-    localStorage.setItem(STORAGE_KEYS.EXAM_RESULTS, JSON.stringify(results))
+    const key = getStorageKey(STORAGE_KEYS.EXAM_RESULTS, subjectId)
+    localStorage.setItem(key, JSON.stringify(results))
   },
 
-  clearExamResults: () => {
+  clearExamResults: (subjectId: string) => {
     if (typeof window === "undefined") return
-    localStorage.removeItem(STORAGE_KEYS.EXAM_RESULTS)
+    const key = getStorageKey(STORAGE_KEYS.EXAM_RESULTS, subjectId)
+    localStorage.removeItem(key)
   },
 
-  // Exam records management
-  getExamRecords: (): ExamRecord[] => {
+  // Exam records management (Historical records)
+  getExamRecords: (subjectId: string): ExamRecord[] => {
     if (typeof window === "undefined") return []
-    const data = localStorage.getItem("exam_records")
+    const key = getStorageKey(STORAGE_KEYS.EXAM_RECORDS, subjectId)
+    const data = localStorage.getItem(key)
     return data ? JSON.parse(data) : []
   },
 
-  saveExamRecord: (record: ExamRecord) => {
+  saveExamRecord: (subjectId: string, record: ExamRecord) => {
     if (typeof window === "undefined") return
-    const records = storage.getExamRecords()
-    records.push(record)
-    localStorage.setItem("exam_records", JSON.stringify(records))
+    const records = storage.getExamRecords(subjectId)
+    records.push({ ...record, subjectId })
+    const key = getStorageKey(STORAGE_KEYS.EXAM_RECORDS, subjectId)
+    localStorage.setItem(key, JSON.stringify(records))
   },
 
-  clearExamRecords: () => {
+  clearExamRecords: (subjectId: string) => {
     if (typeof window === "undefined") return
-    localStorage.removeItem("exam_records")
+    const key = getStorageKey(STORAGE_KEYS.EXAM_RECORDS, subjectId)
+    localStorage.removeItem(key)
   },
 }

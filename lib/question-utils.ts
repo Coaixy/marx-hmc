@@ -1,11 +1,14 @@
-import { type SingleChoiceQuestion, type MultipleChoiceQuestion, DEFAULT_QUESTION_BANK } from "./question-data"
+import { type SingleChoiceQuestion, type MultipleChoiceQuestion, getQuestionBank } from "./question-data"
 
 // 联合类型，兼容现有的使用方式
 export type Question = SingleChoiceQuestion | MultipleChoiceQuestion
 
-export const getSequentialQuestion = (type: "single" | "multiple" | "trueFalse", index: number): Question | null => {
+export const getSequentialQuestion = (subjectId: string, type: "single" | "multiple" | "trueFalse", index: number): Question | null => {
+  const bank = getQuestionBank(subjectId)
+  
   if (type === "trueFalse") {
-    const question = DEFAULT_QUESTION_BANK.判断题[index]
+    const questions = bank.判断题 || []
+    const question = questions[index]
     return question ? {
       题干: question.题干,
       答案: question.答案 === "√" ? "A" : "B",
@@ -18,13 +21,16 @@ export const getSequentialQuestion = (type: "single" | "multiple" | "trueFalse",
       难度: ""
     } : null
   }
-  const questions = type === "single" ? DEFAULT_QUESTION_BANK.单选题 : DEFAULT_QUESTION_BANK.多选题
+  
+  const questions = type === "single" ? (bank.单选题 || []) : (bank.多选题 || [])
   return questions[index] || null
 }
 
-export const getRandomQuestion = (type: "single" | "multiple" | "trueFalse"): { question: Question; index: number } | null => {
+export const getRandomQuestion = (subjectId: string, type: "single" | "multiple" | "trueFalse"): { question: Question; index: number } | null => {
+  const bank = getQuestionBank(subjectId)
+
   if (type === "trueFalse") {
-    const questions = DEFAULT_QUESTION_BANK.判断题
+    const questions = bank.判断题 || []
     if (questions.length === 0) return null
     const index = Math.floor(Math.random() * questions.length)
     const question = questions[index]
@@ -42,16 +48,18 @@ export const getRandomQuestion = (type: "single" | "multiple" | "trueFalse"): { 
       index
     }
   }
-  const questions = type === "single" ? DEFAULT_QUESTION_BANK.单选题 : DEFAULT_QUESTION_BANK.多选题
+  const questions = type === "single" ? (bank.单选题 || []) : (bank.多选题 || [])
   if (questions.length === 0) return null
   const index = Math.floor(Math.random() * questions.length)
   return { question: questions[index], index }
 }
 
-export const getExamQuestions = () => {
-  const singleQuestions = DEFAULT_QUESTION_BANK.单选题.sort(() => Math.random() - 0.5).slice(0, 25)
-  const multipleQuestions = DEFAULT_QUESTION_BANK.多选题.sort(() => Math.random() - 0.5).slice(0, 5)
-  const trueFalseQuestions = DEFAULT_QUESTION_BANK.判断题
+export const getExamQuestions = (subjectId: string) => {
+  const bank = getQuestionBank(subjectId)
+  
+  const singleQuestions = (bank.单选题 || []).sort(() => Math.random() - 0.5).slice(0, 25)
+  const multipleQuestions = (bank.多选题 || []).sort(() => Math.random() - 0.5).slice(0, 5)
+  const trueFalseQuestions = (bank.判断题 || [])
     .map((q) => ({
       ...q,
       答案: q.答案 === "√" ? "A" : "B",
@@ -63,10 +71,11 @@ export const getExamQuestions = () => {
   return { singleQuestions, multipleQuestions, trueFalseQuestions }
 }
 
-export const getTotalQuestions = () => {
+export const getTotalQuestions = (subjectId: string) => {
+  const bank = getQuestionBank(subjectId)
   return {
-    single: DEFAULT_QUESTION_BANK.单选题.length,
-    multiple: DEFAULT_QUESTION_BANK.多选题.length,
-    trueFalse: DEFAULT_QUESTION_BANK.判断题.length,
+    single: (bank.单选题 || []).length,
+    multiple: (bank.多选题 || []).length,
+    trueFalse: (bank.判断题 || []).length,
   }
 }

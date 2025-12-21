@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button"
 import { getRandomQuestion, getTotalQuestions } from "@/lib/question-utils"
 import { storage } from "@/lib/storage"
 import { ChevronLeft, Shuffle, Home } from "lucide-react"
+import { useSubject } from "@/components/subject-provider"
 
 export default function RandomPage() {
-  const { single, multiple, trueFalse } = getTotalQuestions()
+  const { subjectId, subject } = useSubject()
+  const { single, multiple, trueFalse } = getTotalQuestions(subjectId)
   const [mode, setMode] = useState<"single" | "multiple" | "trueFalse">("single")
-  const [currentQuestion, setCurrentQuestion] = useState(getRandomQuestion(mode))
+  const [currentQuestion, setCurrentQuestion] = useState<{ question: any; index: number } | null>(null)
   const [selectedAnswer, setSelectedAnswer] = useState<string>()
   const [submitted, setSubmitted] = useState(false)
   const [count, setCount] = useState(0)
@@ -19,7 +21,22 @@ export default function RandomPage() {
 
   useEffect(() => {
     setMounted(true)
-  }, [])
+    // Check if default mode has questions, if not switch
+    if (single === 0) {
+       if (multiple > 0) setMode("multiple")
+       else if (trueFalse > 0) setMode("trueFalse")
+    }
+  }, [single, multiple, trueFalse])
+
+  useEffect(() => {
+    if (!mounted) return
+    // Load first question when subject or mode ready
+    const next = getRandomQuestion(subjectId, mode)
+    setCurrentQuestion(next)
+    setSelectedAnswer("")
+    setSubmitted(false)
+    setCount(0)
+  }, [subjectId, mode, mounted])
 
   const handleAnswerSelect = (option: string) => {
     if (submitted) return
@@ -44,7 +61,7 @@ export default function RandomPage() {
 
     const isCorrect = selectedAnswer === currentQuestion.question.答案
     if (!isCorrect) {
-      storage.addWrongAnswer({
+      storage.addWrongAnswer(subjectId, {
         id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9),
         questionIndex: currentQuestion.index,
         type: mode,
@@ -57,7 +74,7 @@ export default function RandomPage() {
   }
 
   const handleNext = () => {
-    const next = getRandomQuestion(mode)
+    const next = getRandomQuestion(subjectId, mode)
     setCurrentQuestion(next)
     setSelectedAnswer("")
     setSubmitted(false)
@@ -66,11 +83,7 @@ export default function RandomPage() {
 
   const handleModeChange = (newMode: "single" | "multiple" | "trueFalse") => {
     setMode(newMode)
-    const next = getRandomQuestion(newMode)
-    setCurrentQuestion(next)
-    setSelectedAnswer("")
-    setSubmitted(false)
-    setCount(0)
+    // Effect will handle loading question
   }
 
   if (!mounted) return null
@@ -84,6 +97,9 @@ export default function RandomPage() {
               <ChevronLeft className="w-4 h-4 mr-2" /> 返回首页
             </Button>
           </Link>
+          <div className="text-center text-muted-foreground p-8">
+            暂无题目或题库为空
+          </div>
         </div>
       </div>
     )
@@ -100,38 +116,44 @@ export default function RandomPage() {
             </Button>
           </Link>
           <div className="text-center">
-            <h1 className="font-semibold text-primary">随机刷题</h1>
+            <h1 className="font-semibold text-primary">随机刷题 - {subject?.name}</h1>
             <p className="text-xs text-muted-foreground">已做 {count} 题</p>
           </div>
           <div className="w-10" />
         </div>
 
         {/* Mode selector */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          <Button
-            variant={mode === "single" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleModeChange("single")}
-            className="flex-1"
-          >
-            单选题
-          </Button>
-          <Button
-            variant={mode === "multiple" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleModeChange("multiple")}
-            className="flex-1"
-          >
-            多选题
-          </Button>
-          <Button
-            variant={mode === "trueFalse" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleModeChange("trueFalse")}
-            className="flex-1"
-          >
-            判断题
-          </Button>
+        <div className="flex gap-2 mb-4 overflow-x-auto">
+          {single > 0 && (
+            <Button
+              variant={mode === "single" ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleModeChange("single")}
+              className="flex-1"
+            >
+              单选题
+            </Button>
+          )}
+          {multiple > 0 && (
+            <Button
+              variant={mode === "multiple" ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleModeChange("multiple")}
+              className="flex-1"
+            >
+              多选题
+            </Button>
+          )}
+          {trueFalse > 0 && (
+            <Button
+              variant={mode === "trueFalse" ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleModeChange("trueFalse")}
+              className="flex-1"
+            >
+              判断题
+            </Button>
+          )}
         </div>
 
         {/* Question */}
