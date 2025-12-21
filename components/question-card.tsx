@@ -47,6 +47,14 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     return "border-border hover:border-primary/50"
   }
 
+  const getOptionText = (text: string, optionLabel: string) => {
+    if (!text) return ""
+    // Remove "A.", "B.", "A、", "B、" etc from the start
+    // Case insensitive, handles dots, pauses, and spaces
+    const regex = new RegExp(`^${optionLabel}[.、\\s]+`, "i")
+    return text.replace(regex, "").trim()
+  }
+
   return (
     <Card className="w-full border-primary/20">
       <CardHeader>
@@ -85,9 +93,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 ? option === "A"
                   ? "√"
                   : "×"
-                : (question as SingleChoiceQuestion | MultipleChoiceQuestion)[
-                    option as keyof (SingleChoiceQuestion | MultipleChoiceQuestion)
-                  ]}
+                : getOptionText(
+                    (question as SingleChoiceQuestion | MultipleChoiceQuestion)[
+                      option as keyof (SingleChoiceQuestion | MultipleChoiceQuestion)
+                    ],
+                    option
+                  )}
             </button>
           ))}
         </div>
