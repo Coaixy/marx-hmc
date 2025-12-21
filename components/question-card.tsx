@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React, { useMemo } from "react"
 import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion } from "@/lib/question-data"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -23,7 +23,18 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   selectedAnswer,
   submitted = false,
 }) => {
-  const options = type === "trueFalse" ? ["A", "B"] : ["A", "B", "C", "D"]
+  const options = useMemo(() => {
+    if (type === "trueFalse") return ["A", "B"]
+    
+    // Generate options dynamically (A, B, C, D, E, F...)
+    // Checks which keys exist in the question object
+    const possibleOptions = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))
+    return possibleOptions.filter(opt => {
+      const val = (question as any)[opt]
+      return typeof val === "string" && val.trim().length > 0
+    })
+  }, [type, question])
+
   const isCorrect = selectedAnswer === question.答案
 
   const getOptionStyle = (option: string) => {
@@ -47,7 +58,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     return "border-border hover:border-primary/50"
   }
 
-  const getOptionText = (text: string, optionLabel: string) => {
+  const getOptionText = (text: string | undefined, optionLabel: string) => {
     if (!text) return ""
     // Remove "A.", "B.", "A、", "B、" etc from the start
     // Case insensitive, handles dots, pauses, and spaces
@@ -94,9 +105,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                   ? "√"
                   : "×"
                 : getOptionText(
-                    (question as SingleChoiceQuestion | MultipleChoiceQuestion)[
-                      option as keyof (SingleChoiceQuestion | MultipleChoiceQuestion)
-                    ],
+                    (question as any)[option],
                     option
                   )}
             </button>

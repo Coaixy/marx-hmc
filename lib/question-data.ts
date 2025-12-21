@@ -5,6 +5,7 @@ export interface SingleChoiceQuestion {
   B: string
   C: string
   D: string
+  E?: string
   答案: string
   难度: string
 }
@@ -16,6 +17,7 @@ export interface MultipleChoiceQuestion {
   B: string
   C: string
   D: string
+  E?: string
   答案: string
   难度: string
 }
