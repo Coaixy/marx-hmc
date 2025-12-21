@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Home, BookOpen, Shuffle, ClipboardList, AlertCircle } from "lucide-react"
+import { Home, BookOpen, Shuffle, ClipboardList, AlertCircle, Search } from "lucide-react"
 
 const isDev = process.env.NODE_ENV === "development"
 const suffix = isDev ? "" : ".html"
@@ -23,6 +23,11 @@ const navigationItems = [
     label: "随机",
     href: `/random${suffix}`,
     icon: Shuffle,
+  },
+  {
+    label: "搜题",
+    href: `/search${suffix}`,
+    icon: Search,
   },
   {
     label: "考试",
