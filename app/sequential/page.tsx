@@ -17,7 +17,7 @@ export default function SequentialPage() {
   const [mode, setMode] = useState<"single" | "multiple" | "trueFalse">("single")
   const [questionIndex, setQuestionIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string>()
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted, setSubmitted] = useState(true)
   const [mounted, setMounted] = useState(false)
 
   // Reset or load progress when subject changes
@@ -43,7 +43,7 @@ export default function SequentialPage() {
     
     // Reset state
     setSelectedAnswer("")
-    setSubmitted(false)
+    setSubmitted(true)
   }, [subjectId, single, multiple, trueFalse])
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function SequentialPage() {
       setQuestionIndex(progress.trueFalseIndex)
     }
     setSelectedAnswer("")
-    setSubmitted(false)
+    setSubmitted(true)
   }, [mode, subjectId]) // Add subjectId to dep, though managed by above effect too
 
   const handleAnswerSelect = (option: string) => {
@@ -80,29 +80,11 @@ export default function SequentialPage() {
   const currentQuestion = getSequentialQuestion(subjectId, mode, questionIndex)
   const maxQuestions = mode === "single" ? single : mode === "multiple" ? multiple : trueFalse
 
-  const handleSubmit = () => {
-    if (!selectedAnswer || !currentQuestion) return
-    setSubmitted(true)
-
-    const isCorrect = selectedAnswer === currentQuestion.答案
-    if (!isCorrect) {
-      storage.addWrongAnswer(subjectId, {
-        id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9),
-        questionIndex,
-        type: mode,
-        userAnswer: selectedAnswer,
-        correctAnswer: currentQuestion.答案,
-        isCorrect: false,
-        timestamp: Date.now(),
-      })
-    }
-  }
-
   const handleNext = () => {
     if (questionIndex + 1 < maxQuestions) {
       setQuestionIndex(questionIndex + 1)
       setSelectedAnswer("")
-      setSubmitted(false)
+      setSubmitted(true)
 
       const progress = storage.getProgress(subjectId)
       if (mode === "single") {
@@ -120,14 +102,14 @@ export default function SequentialPage() {
     if (questionIndex > 0) {
       setQuestionIndex(questionIndex - 1)
       setSelectedAnswer("")
-      setSubmitted(false)
+      setSubmitted(true)
     }
   }
 
   const handleJump = (index: number) => {
     setQuestionIndex(index)
     setSelectedAnswer("")
-    setSubmitted(false)
+    setSubmitted(true)
   }
 
   if (!mounted) return null
@@ -162,7 +144,7 @@ export default function SequentialPage() {
             </Button>
           </Link>
           <div className="text-center">
-            <h1 className="font-semibold text-primary">顺序刷题 - {subject?.name}</h1>
+            <h1 className="font-semibold text-primary">背题模式 - {subject?.name}</h1>
           </div>
           <AnswerSheet
             total={maxQuestions}
@@ -222,25 +204,19 @@ export default function SequentialPage() {
 
         {/* Controls */}
         <div className="space-y-3 fixed bottom-[60px] left-0 right-0 p-4 bg-gradient-to-t from-blue-50 to-transparent dark:from-slate-950 dark:to-transparent max-w-md mx-auto pointer-events-none z-40">
-          {!submitted ? (
-            <Button onClick={handleSubmit} disabled={!selectedAnswer} className="w-full pointer-events-auto" size="lg">
-              提交答案
+          <div className="flex gap-2 pointer-events-auto">
+            <Button
+              onClick={handlePrev}
+              disabled={questionIndex === 0}
+              variant="outline"
+              className="flex-1 bg-transparent"
+            >
+              <ChevronLeft className="w-4 h-4 mr-2" /> 上一题
             </Button>
-          ) : (
-            <div className="flex gap-2 pointer-events-auto">
-              <Button
-                onClick={handlePrev}
-                disabled={questionIndex === 0}
-                variant="outline"
-                className="flex-1 bg-transparent"
-              >
-                <ChevronLeft className="w-4 h-4 mr-2" /> 上一题
-              </Button>
-              <Button onClick={handleNext} disabled={questionIndex + 1 >= maxQuestions} className="flex-1">
-                下一题 <ChevronRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-          )}
+            <Button onClick={handleNext} disabled={questionIndex + 1 >= maxQuestions} className="flex-1">
+              下一题 <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

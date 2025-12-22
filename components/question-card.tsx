@@ -36,6 +36,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   }, [type, question])
 
   const isCorrect = selectedAnswer === question.答案
+  const showResultFeedback = submitted && selectedAnswer
 
   const getOptionStyle = (option: string) => {
     const isSelected =
@@ -115,13 +116,15 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         {submitted && (
           <div
             className={`p-3 rounded-lg ${
-              isCorrect
-                ? "bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-100"
-                : "bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-100"
+              showResultFeedback
+                ? isCorrect
+                  ? "bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-100"
+                  : "bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-100"
+                : "bg-blue-50 dark:bg-blue-950/30 text-blue-800 dark:text-blue-100"
             }`}
           >
-            <p className="font-medium">{isCorrect ? "正确" : "错误"}</p>
-            <p className="text-sm mt-1">
+            {showResultFeedback && <p className="font-medium">{isCorrect ? "正确" : "错误"}</p>}
+            <p className={showResultFeedback ? "text-sm mt-1" : "font-medium"}>
               正确答案：
               {type === "trueFalse"
                 ? question.答案 === "A"

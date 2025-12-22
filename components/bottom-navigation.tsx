@@ -15,7 +15,7 @@ const navigationItems = [
     icon: Home,
   },
   {
-    label: "顺序",
+    label: "背题",
     href: `/sequential${suffix}`,
     icon: BookOpen,
   },
