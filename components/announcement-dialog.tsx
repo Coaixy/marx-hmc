@@ -33,7 +33,8 @@ export function AnnouncementDialog({ open, onOpenChange }: AnnouncementDialogPro
 
         <div className="grid gap-4 py-2">
           <div className="text-sm text-slate-600 dark:text-slate-300 space-y-2">
-            <p>🚀 <strong>支持多科目切换</strong>：现已上线马原、生化题库。</p>
+            <p>🚀 <strong>新增题库</strong>：现已上线<b>临床生物化学</b>题库。</p>
+            <p>📖 <strong>背题模式</strong>：顺序刷题升级为背题模式，直接查看答案，高效记忆。</p>
             <p>📊 <strong>独立进度管理</strong>：各科目错题、进度互不干扰。</p>
             <p>祝大家复习顺利，逢考必过！</p>
           </div>
