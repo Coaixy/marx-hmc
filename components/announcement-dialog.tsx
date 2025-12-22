@@ -1,9 +1,9 @@
 "use client"
 
 import Image from "next/image"
-import { 
-  Dialog, 
-  DialogContent, 
+import {
+  Dialog,
+  DialogContent,
   DialogTitle,
   DialogDescription,
   DialogFooter,
@@ -33,22 +33,23 @@ export function AnnouncementDialog({ open, onOpenChange }: AnnouncementDialogPro
 
         <div className="grid gap-4 py-2">
           <div className="text-sm text-slate-600 dark:text-slate-300 space-y-2">
+            <p>🐛 <strong>修复错误</strong>：修复了<b>生物化学</b>题库中的错误。</p>
             <p>🚀 <strong>新增题库</strong>：现已上线<b>临床生物化学</b>题库。</p>
             <p>📖 <strong>背题模式</strong>：顺序刷题升级为背题模式，直接查看答案，高效记忆。</p>
             <p>📊 <strong>独立进度管理</strong>：各科目错题、进度互不干扰。</p>
             <p>祝大家复习顺利，逢考必过！</p>
           </div>
-          
+
           <div className="relative w-full h-[300px] rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
             <Image
-              src="/IMG_1353.JPG" 
+              src="/IMG_1353.JPG"
               alt="Announcement Detail"
               fill
               className="object-contain"
             />
           </div>
         </div>
-          
+
         <DialogFooter>
           <Button className="w-full" onClick={() => onOpenChange(false)}>
             我知道了
