@@ -211,7 +211,7 @@ export default function SequentialPage() {
         </div>
 
         {/* Controls */}
-        <div className="space-y-3 fixed bottom-[60px] left-0 right-0 p-4 bg-gradient-to-t from-blue-50 to-transparent dark:from-slate-950 dark:to-transparent max-w-md mx-auto pointer-events-none z-40">
+        <div className="space-y-3 fixed bottom-24 left-0 right-0 p-4 bg-gradient-to-t from-blue-50 to-transparent dark:from-slate-950 dark:to-transparent max-w-md mx-auto pointer-events-none z-40">
           <div className="flex gap-2 pointer-events-auto">
             <Button
               onClick={handlePrev}

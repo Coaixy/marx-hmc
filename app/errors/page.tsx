@@ -183,7 +183,7 @@ export default function ErrorsPage() {
 
         {/* Clear all button */}
         {!selectedId && (
-          <div className="fixed bottom-20 left-4 right-4 max-w-md mx-auto pointer-events-none">
+          <div className="fixed bottom-24 left-4 right-4 max-w-md mx-auto pointer-events-none">
             <Button
               onClick={handleClearAll}
               variant="outline"
