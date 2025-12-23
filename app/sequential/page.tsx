@@ -77,32 +77,39 @@ export default function SequentialPage() {
     }
   }
 
+  const saveCurrentProgress = (newIndex: number) => {
+    const progress = storage.getProgress(subjectId)
+    if (mode === "single") {
+      progress.singleIndex = newIndex
+    } else if (mode === "multiple") {
+      progress.multipleIndex = newIndex
+    } else {
+      progress.trueFalseIndex = newIndex
+    }
+    progress.lastUpdated = Date.now()
+    storage.setProgress(subjectId, progress)
+  }
+
   const currentQuestion = getSequentialQuestion(subjectId, mode, questionIndex)
   const maxQuestions = mode === "single" ? single : mode === "multiple" ? multiple : trueFalse
 
   const handleNext = () => {
     if (questionIndex + 1 < maxQuestions) {
-      setQuestionIndex(questionIndex + 1)
+      const nextIndex = questionIndex + 1
+      setQuestionIndex(nextIndex)
       setSelectedAnswer("")
       setSubmitted(true)
-
-      const progress = storage.getProgress(subjectId)
-      if (mode === "single") {
-        progress.singleIndex = Math.max(progress.singleIndex, questionIndex + 1)
-      } else if (mode === "multiple") {
-        progress.multipleIndex = Math.max(progress.multipleIndex, questionIndex + 1)
-      } else {
-        progress.trueFalseIndex = Math.max(progress.trueFalseIndex, questionIndex + 1)
-      }
-      storage.setProgress(subjectId, progress)
+      saveCurrentProgress(nextIndex)
     }
   }
 
   const handlePrev = () => {
     if (questionIndex > 0) {
-      setQuestionIndex(questionIndex - 1)
+      const prevIndex = questionIndex - 1
+      setQuestionIndex(prevIndex)
       setSelectedAnswer("")
       setSubmitted(true)
+      saveCurrentProgress(prevIndex)
     }
   }
 
@@ -110,6 +117,7 @@ export default function SequentialPage() {
     setQuestionIndex(index)
     setSelectedAnswer("")
     setSubmitted(true)
+    saveCurrentProgress(index)
   }
 
   if (!mounted) return null
