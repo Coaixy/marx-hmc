@@ -6,9 +6,6 @@ import { cn } from "@/lib/utils"
 import { Home, BookOpen, Shuffle } from "lucide-react"
 import { motion } from "framer-motion"
 
-const isDev = process.env.NODE_ENV === "development"
-const suffix = isDev ? "" : ".html"
-
 const navigationItems = [
   {
     label: "首页",
@@ -17,12 +14,12 @@ const navigationItems = [
   },
   {
     label: "背题",
-    href: `/sequential${suffix}`,
+    href: "/sequential",
     icon: BookOpen,
   },
   {
     label: "随机",
-    href: `/random${suffix}`,
+    href: "/random",
     icon: Shuffle,
   },
 ]
