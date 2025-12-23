@@ -5,9 +5,11 @@ import Link from "next/link"
 import { QuestionCard } from "@/components/question-card"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 import { getSequentialQuestion, getTotalQuestions } from "@/lib/question-utils"
 import { storage } from "@/lib/storage"
-import { ChevronLeft, ChevronRight, Home } from "lucide-react"
+import { ChevronLeft, ChevronRight, Home, Eye, EyeOff, CheckCircle } from "lucide-react"
 import { AnswerSheet } from "@/components/answer-sheet"
 import { useSubject } from "@/components/subject-provider"
 
@@ -19,6 +21,7 @@ export default function SequentialPage() {
   const [selectedAnswer, setSelectedAnswer] = useState<string>()
   const [submitted, setSubmitted] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const [isReciteMode, setIsReciteMode] = useState(true)
 
   // Reset or load progress when subject changes
   useEffect(() => {
@@ -43,8 +46,8 @@ export default function SequentialPage() {
     
     // Reset state
     setSelectedAnswer("")
-    setSubmitted(true)
-  }, [subjectId, single, multiple, trueFalse])
+    setSubmitted(isReciteMode)
+  }, [subjectId, single, multiple, trueFalse, isReciteMode])
 
   useEffect(() => {
     if (!mounted) return
@@ -57,7 +60,7 @@ export default function SequentialPage() {
       setQuestionIndex(progress.trueFalseIndex)
     }
     setSelectedAnswer("")
-    setSubmitted(true)
+    setSubmitted(isReciteMode)
   }, [mode, subjectId]) // Add subjectId to dep, though managed by above effect too
 
   const handleAnswerSelect = (option: string) => {
@@ -98,7 +101,7 @@ export default function SequentialPage() {
       const nextIndex = questionIndex + 1
       setQuestionIndex(nextIndex)
       setSelectedAnswer("")
-      setSubmitted(true)
+      setSubmitted(isReciteMode)
       saveCurrentProgress(nextIndex)
     }
   }
@@ -108,7 +111,7 @@ export default function SequentialPage() {
       const prevIndex = questionIndex - 1
       setQuestionIndex(prevIndex)
       setSelectedAnswer("")
-      setSubmitted(true)
+      setSubmitted(isReciteMode)
       saveCurrentProgress(prevIndex)
     }
   }
@@ -116,9 +119,15 @@ export default function SequentialPage() {
   const handleJump = (index: number) => {
     setQuestionIndex(index)
     setSelectedAnswer("")
-    setSubmitted(true)
+    setSubmitted(isReciteMode)
     saveCurrentProgress(index)
   }
+
+  const handleSubmit = () => {
+    if (!selectedAnswer) return
+    setSubmitted(true)
+  }
+
 
   if (!mounted) return null
 
@@ -154,13 +163,30 @@ export default function SequentialPage() {
           <div className="text-center">
             <h1 className="font-semibold text-primary">背题模式 - {subject?.name}</h1>
           </div>
-          <AnswerSheet
-            total={maxQuestions}
-            current={questionIndex}
-            answered={new Set(Array.from({ length: questionIndex }, (_, i) => i))}
-            onJump={handleJump}
-            title={`${mode === "single" ? "单选题" : mode === "multiple" ? "多选题" : "判断题"}答题卡`}
-          />
+          
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-800">
+               <Label htmlFor="recite-mode" className="text-xs font-medium cursor-pointer flex items-center gap-1.5">
+                  {isReciteMode ? <Eye className="w-3.5 h-3.5 text-blue-500" /> : <EyeOff className="w-3.5 h-3.5 text-slate-500" />}
+                  <span className={isReciteMode ? "text-blue-600 dark:text-blue-400" : "text-slate-600 dark:text-slate-400"}>
+                    {isReciteMode ? "背题" : "做题"}
+                  </span>
+               </Label>
+               <Switch
+                  id="recite-mode"
+                  checked={isReciteMode}
+                  onCheckedChange={setIsReciteMode}
+                  className="scale-75 data-[state=checked]:bg-blue-500"
+               />
+            </div>
+            <AnswerSheet
+              total={maxQuestions}
+              current={questionIndex}
+              answered={new Set(Array.from({ length: questionIndex }, (_, i) => i))}
+              onJump={handleJump}
+              title={`${mode === "single" ? "单选题" : mode === "multiple" ? "多选题" : "判断题"}答题卡`}
+            />
+          </div>
         </div>
 
         {/* Mode selector - hide if 0 questions */}
@@ -221,6 +247,17 @@ export default function SequentialPage() {
             >
               <ChevronLeft className="w-4 h-4 mr-2" /> 上一题
             </Button>
+            
+            {!isReciteMode && !submitted && (
+                <Button 
+                    onClick={handleSubmit} 
+                    disabled={!selectedAnswer} 
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30"
+                >
+                    <CheckCircle className="w-4 h-4 mr-2" /> 提交
+                </Button>
+            )}
+
             <Button onClick={handleNext} disabled={questionIndex + 1 >= maxQuestions} className="flex-1">
               下一题 <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
@@ -230,3 +267,4 @@ export default function SequentialPage() {
     </div>
   )
 }
+
