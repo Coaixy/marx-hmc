@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Home, BookOpen, Shuffle } from "lucide-react"
+import { motion } from "framer-motion"
 
 const isDev = process.env.NODE_ENV === "development"
 const suffix = isDev ? "" : ".html"
@@ -30,8 +31,8 @@ export function BottomNavigation() {
   const pathname = usePathname()
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-      <div className="flex items-center gap-1 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 shadow-2xl shadow-slate-200/50 dark:shadow-black/50 ring-1 ring-white/50 dark:ring-slate-700/50">
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+      <nav className="relative flex items-center gap-2 p-2 rounded-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.12)] ring-1 ring-black/5 dark:ring-white/5 transition-all duration-500 hover:scale-105 hover:bg-white/80 dark:hover:bg-slate-900/80">
         {navigationItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href
@@ -41,30 +42,61 @@ export function BottomNavigation() {
               key={item.href}
               href={item.href}
               className={cn(
-                "relative flex items-center justify-center rounded-full transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
+                "relative flex items-center justify-center rounded-full transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
                 isActive
-                  ? "bg-blue-600 text-white px-5 py-2.5 gap-2 shadow-lg shadow-blue-600/25"
-                  : "w-12 h-12 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                  ? "text-white px-6 py-3"
+                  : "w-12 h-12 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
               )}
             >
-              <Icon 
-                className={cn(
-                  "w-5 h-5 transition-transform duration-500", 
-                  isActive && "scale-105"
-                )} 
-                strokeWidth={2.5} 
-              />
+              {isActive && (
+                <motion.div
+                  layoutId="active-pill"
+                  className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-[0_4px_12px_rgba(59,130,246,0.5),inset_0_1px_1px_rgba(255,255,255,0.3)]"
+                  transition={{
+                    type: "spring",
+                    stiffness: 220,
+                    damping: 25,
+                  }}
+                >
+                    {/* Inner sheen effect */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-50" />
+                </motion.div>
+              )}
               
-              <span className={cn(
-                "text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-500",
-                isActive ? "max-w-[100px] opacity-100 translate-x-0" : "max-w-0 opacity-0 -translate-x-2 hidden"
-              )}>
-                {item.label}
-              </span>
+              <div className="relative z-10 flex items-center gap-2">
+                <Icon 
+                  className={cn(
+                    "w-5 h-5 transition-transform duration-300", 
+                    isActive && "scale-105" 
+                  )} 
+                  strokeWidth={isActive ? 2.5 : 2} 
+                />
+                
+                <motion.span
+                  initial={false}
+                  animate={{
+                    width: isActive ? "auto" : 0,
+                    opacity: isActive ? 1 : 0,
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 250,
+                    damping: 30,
+                  }}
+                  className="overflow-hidden whitespace-nowrap"
+                >
+                  <span className={cn(
+                    "text-sm font-semibold tracking-wide block pl-1", 
+                    !isActive && "hidden" // Ensure hidden when width is animating to 0 to avoid layout jumping if width calculation lags
+                  )}>
+                    {item.label}
+                  </span>
+                </motion.span>
+              </div>
             </Link>
           )
         })}
-      </div>
+      </nav>
     </div>
   )
 }
