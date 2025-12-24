@@ -34,6 +34,12 @@ export function AnnouncementDialog({ open, onOpenChange }: AnnouncementDialogPro
         <div className="flex-1 overflow-y-auto">
           <div className="space-y-4 py-2">
             <div className="text-sm text-slate-600 dark:text-slate-300 space-y-3">
+              <div className="bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg">
+                <p className="font-semibold text-amber-700 dark:text-amber-300 mb-1">📖 题库更新</p>
+                <p>• <strong>新增题库</strong>：新增《临床基础检验》题库</p>
+                <p>• <strong>全面适配</strong>：完美支持搜题、顺序练习、随机刷题及模拟考试</p>
+              </div>
+
               <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg">
                 <p className="font-semibold text-blue-700 dark:text-blue-300 mb-1">✨ 新界面设计</p>
                 <p>• <strong>Dock 导航栏</strong>：底部悬浮胶囊导航，流畅切换动画</p>
