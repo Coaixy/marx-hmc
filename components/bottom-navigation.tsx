@@ -48,7 +48,7 @@ export function BottomNavigation() {
               {isActive && (
                 <motion.div
                   layoutId="active-pill"
-                  className="absolute inset-0 bg-blue-600 dark:bg-blue-500 rounded-full shadow-[0_2px_8px_rgba(37,99,235,0.4)]"
+                  className="absolute inset-0 bg-red-600 dark:bg-red-500 rounded-full shadow-[0_2px_8px_rgba(220,38,38,0.4)]"
                   transition={{
                     type: "spring",
                     stiffness: 160,
@@ -57,6 +57,8 @@ export function BottomNavigation() {
                 >
                     {/* Subtle sheen */}
                     <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/5 to-white/10" />
+                    {/* Christmas ornament */}
+                    <div className="absolute -top-1 -right-1 text-[10px] animate-bounce">❄️</div>
                 </motion.div>
               )}
               
