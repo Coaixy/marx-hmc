@@ -8,7 +8,6 @@ import {
   Trash2, 
   BrainCircuit,
   BookMarked,
-  Sparkles,
   ChevronDown,
   GraduationCap,
   Megaphone,
@@ -102,44 +101,28 @@ export default function Home() {
 
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Modern Header Section */}
-        <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-slate-900 shadow-xl border border-slate-100 dark:border-slate-800 p-6 md:p-10">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium">
-                <Sparkles className="w-5 h-5" />
-                <span>综合刷题助手</span>
+        <div className="relative overflow-hidden rounded-3xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl shadow-xl border border-white/20 dark:border-slate-800/50 p-3 md:p-4">
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 px-2">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20">
+                <BrainCircuit className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
-                准备好开始学习了吗？
-              </h1>
-              <p className="text-slate-500 dark:text-slate-400 text-lg max-w-lg">
-                选择一个科目，开始你的专项训练。
-              </p>
+              <div>
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">医学期末刷题</h2>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium">Medical Exam Prep</p>
+              </div>
             </div>
 
-            <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-10 w-10 rounded-full border-slate-200 dark:border-slate-800 hover:bg-blue-50 hover:border-blue-200 dark:hover:bg-blue-900/20 transition-all shrink-0"
-                onClick={() => setShowAnnouncement(true)}
-              >
-                 <Megaphone className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              </Button>
-
-              <div className="flex flex-wrap p-1 bg-slate-100/80 dark:bg-slate-800/50 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex p-1 bg-slate-100/50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm">
                 {Object.values(SUBJECTS).map((sub) => (
                   <button
                     key={sub.id}
                     onClick={() => setSubjectId(sub.id as SubjectId)}
                     className={cn(
-                      "px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2",
+                      "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2",
                       subjectId === sub.id
-                        ? "bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-sm"
+                        ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-md"
                         : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                     )}
                   >
@@ -148,6 +131,33 @@ export default function Home() {
                   </button>
                 ))}
               </div>
+              
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all shrink-0"
+                onClick={() => setShowAnnouncement(true)}
+              >
+                 <Megaphone className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              </Button>
+            </div>
+            
+            {/* Mobile Subject Switcher */}
+            <div className="sm:hidden w-full p-1 bg-slate-100/50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 flex overflow-x-auto no-scrollbar gap-1">
+               {Object.values(SUBJECTS).map((sub) => (
+                  <button
+                    key={sub.id}
+                    onClick={() => setSubjectId(sub.id as SubjectId)}
+                    className={cn(
+                      "flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200 flex items-center justify-center gap-1 whitespace-nowrap",
+                      subjectId === sub.id
+                        ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm"
+                        : "text-slate-500 dark:text-slate-400"
+                    )}
+                  >
+                    {sub.name}
+                  </button>
+                ))}
             </div>
           </div>
         </div>
