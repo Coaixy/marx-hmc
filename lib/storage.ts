@@ -31,10 +31,35 @@ const STORAGE_KEYS = {
   WRONG_ANSWERS: "wrong_answers",
   STUDY_PROGRESS: "study_progress",
   EXAM_RESULTS: "exam_results",
-  EXAM_RECORDS: "exam_records"
+  EXAM_RECORDS: "exam_records",
+  SETTINGS: "app_settings"
+}
+
+export interface AppSettings {
+  showSnow: boolean
+}
+
+const DEFAULT_SETTINGS: AppSettings = {
+  showSnow: true
 }
 
 export const storage = {
+  // Settings
+  getSettings: (): AppSettings => {
+    if (typeof window === "undefined") return DEFAULT_SETTINGS
+    const data = localStorage.getItem(STORAGE_KEYS.SETTINGS)
+    return data ? { ...DEFAULT_SETTINGS, ...JSON.parse(data) } : DEFAULT_SETTINGS
+  },
+
+  updateSettings: (settings: Partial<AppSettings>) => {
+    if (typeof window === "undefined") return
+    const current = storage.getSettings()
+    const updated = { ...current, ...settings }
+    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updated))
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event('settings-updated'))
+  },
+
   // Wrong answers management
   getWrongAnswers: (subjectId: string): AnswerRecord[] => {
     if (typeof window === "undefined") return []

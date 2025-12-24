@@ -26,13 +26,25 @@ import { SUBJECTS, type SubjectId } from "@/lib/question-data"
 import { AnnouncementDialog } from "@/components/announcement-dialog"
 import { cn } from "@/lib/utils"
 import { ChristmasHat } from "@/components/christmas-decor"
+import { Snowflake } from "lucide-react"
 
 export default function Home() {
   const { subjectId, setSubjectId, subject } = useSubject()
   const { single, multiple, trueFalse } = getTotalQuestions(subjectId)
   const [showClearDialog, setShowClearDialog] = useState(false)
   const [showAnnouncement, setShowAnnouncement] = useState(false) // New state
-  
+  const [showSnow, setShowSnow] = useState(true)
+
+  useEffect(() => {
+    setShowSnow(storage.getSettings().showSnow)
+  }, [])
+
+  const toggleSnow = () => {
+    const newVal = !showSnow
+    setShowSnow(newVal)
+    storage.updateSettings({ showSnow: newVal })
+  }
+
   const [examStats, setExamStats] = useState({
     bestScore: 0,
     totalExams: 0,
@@ -136,6 +148,19 @@ export default function Home() {
                   </button>
                 ))}
               </div>
+              
+              <Button
+                variant="outline"
+                size="icon"
+                className={cn(
+                  "h-10 w-10 rounded-xl border-slate-200 dark:border-slate-800 shadow-sm transition-all shrink-0",
+                  showSnow ? "bg-red-50 dark:bg-red-900/20 text-red-600" : "bg-white dark:bg-slate-900 text-slate-400"
+                )}
+                onClick={toggleSnow}
+                title={showSnow ? "关闭雪花" : "开启雪花"}
+              >
+                 <Snowflake className={cn("w-4 h-4", showSnow && "animate-spin-slow")} />
+              </Button>
               
               <Button
                 variant="outline"

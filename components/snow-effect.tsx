@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useTheme } from "next-themes"
+import { storage } from "@/lib/storage"
 
 interface Snowflake {
   x: number
@@ -17,8 +18,23 @@ interface Snowflake {
 export function SnowEffect() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { resolvedTheme } = useTheme()
+  const [showSnow, setShowSnow] = useState(true)
 
   useEffect(() => {
+    // Initial load
+    setShowSnow(storage.getSettings().showSnow)
+
+    const handleSettingsUpdate = () => {
+      setShowSnow(storage.getSettings().showSnow)
+    }
+
+    window.addEventListener('settings-updated', handleSettingsUpdate)
+    return () => window.removeEventListener('settings-updated', handleSettingsUpdate)
+  }, [])
+
+  useEffect(() => {
+    if (!showSnow) return
+
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -126,7 +142,9 @@ export function SnowEffect() {
       window.removeEventListener("resize", resize)
       cancelAnimationFrame(animationFrameId)
     }
-  }, [resolvedTheme]) // Re-run when theme changes
+  }, [resolvedTheme, showSnow]) // Re-run when theme or showSnow changes
+
+  if (!showSnow) return null
 
   return (
     <canvas
