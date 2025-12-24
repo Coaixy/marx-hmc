@@ -39,6 +39,7 @@ export interface QuestionBank {
 import questionsData from './marix.json'
 import bioData from './bio.json'
 import medBioData from './med_bio.json'
+import clinicalData from './clinical.json'
 
 // 处理 med_bio 数据，将其转换为标准格式
 const processMedBioData = (data: any[]): QuestionBank => {
@@ -83,6 +84,11 @@ export const SUBJECTS = {
     id: 'med_bio',
     name: '临床生物化学',
     data: processMedBioData(medBioData as any[])
+  },
+  clinical: {
+    id: 'clinical',
+    name: '临床基础检验',
+    data: clinicalData as unknown as QuestionBank
   }
 } as const
 
