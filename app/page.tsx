@@ -24,6 +24,7 @@ import { storage } from "@/lib/storage"
 import { useSubject } from "@/components/subject-provider"
 import { SUBJECTS, type SubjectId } from "@/lib/question-data"
 import { AnnouncementDialog } from "@/components/announcement-dialog"
+import { CountdownTimer } from "@/components/countdown-timer"
 import { cn } from "@/lib/utils"
 import { ChristmasHat } from "@/components/christmas-decor"
 import { Snowflake } from "lucide-react"
@@ -192,6 +193,9 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Countdown Section */}
+        <CountdownTimer />
+
         {/* Announcement Dialog */}
         <AnnouncementDialog open={showAnnouncement} onOpenChange={handleAnnouncementOpenChange} />
 
@@ -272,51 +276,6 @@ export default function Home() {
               </div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Functional Modules */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Link href="/search" className="group">
-            <Card className="h-full hover:shadow-md transition-all duration-200 border-slate-200 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
-              <CardContent className="p-4 flex flex-row sm:flex-col items-center sm:justify-center text-left sm:text-center gap-4 sm:gap-3 h-full">
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl group-hover:scale-110 transition-transform duration-200">
-                  <Search className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">搜题</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">快速查找题目</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-          
-          <Link href="/exam" className="group">
-            <Card className="h-full hover:shadow-md transition-all duration-200 border-slate-200 dark:border-slate-800 hover:border-purple-200 dark:hover:border-purple-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
-              <CardContent className="p-4 flex flex-row sm:flex-col items-center sm:justify-center text-left sm:text-center gap-4 sm:gap-3 h-full">
-                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl group-hover:scale-110 transition-transform duration-200">
-                  <ClipboardList className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">模拟考试</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">全真模拟测试</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/errors" className="group">
-            <Card className="h-full hover:shadow-md transition-all duration-200 border-slate-200 dark:border-slate-800 hover:border-red-200 dark:hover:border-red-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
-              <CardContent className="p-4 flex flex-row sm:flex-col items-center sm:justify-center text-left sm:text-center gap-4 sm:gap-3 h-full">
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-xl group-hover:scale-110 transition-transform duration-200">
-                  <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">错题集</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">复习易错题目</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
         </div>
 
         {/* Footer */}

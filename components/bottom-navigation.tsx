@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Home, BookOpen, Shuffle } from "lucide-react"
+import { Home, BookOpen, Shuffle, Search, ClipboardList, AlertCircle } from "lucide-react"
 import { motion } from "framer-motion"
 
 const navigationItems = [
@@ -21,6 +21,21 @@ const navigationItems = [
     label: "随机",
     href: "/random",
     icon: Shuffle,
+  },
+  {
+    label: "搜题",
+    href: "/search",
+    icon: Search,
+  },
+  {
+    label: "考试",
+    href: "/exam",
+    icon: ClipboardList,
+  },
+  {
+    label: "错题",
+    href: "/errors",
+    icon: AlertCircle,
   },
 ]
 
