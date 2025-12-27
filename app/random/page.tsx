@@ -5,8 +5,8 @@ import Link from "next/link"
 import { QuestionCard } from "@/components/question-card"
 import { Button } from "@/components/ui/button"
 import { getRandomQuestion, getTotalQuestions } from "@/lib/question-utils"
-import { storage } from "@/lib/storage"
-import { ChevronLeft, Shuffle, Home } from "lucide-react"
+import { storage, type RandomProgress } from "@/lib/storage"
+import { ChevronLeft, Shuffle, Home, RotateCcw } from "lucide-react"
 import { useSubject } from "@/components/subject-provider"
 
 export default function RandomPage() {
@@ -21,22 +21,48 @@ export default function RandomPage() {
 
   useEffect(() => {
     setMounted(true)
-    // Check if default mode has questions, if not switch
-    if (single === 0) {
-       if (multiple > 0) setMode("multiple")
-       else if (trueFalse > 0) setMode("trueFalse")
+    
+    // Try to load saved progress
+    const saved = storage.getRandomProgress(subjectId)
+    if (saved) {
+      setMode(saved.mode)
+      setCurrentQuestion(saved.currentQuestion)
+      setCount(saved.count)
+      setSubmitted(saved.submitted)
+      setSelectedAnswer(saved.selectedAnswer || "")
+    } else {
+      // Determine initial mode
+      let initialMode: "single" | "multiple" | "trueFalse" = "single"
+      if (single === 0) {
+        if (multiple > 0) initialMode = "multiple"
+        else if (trueFalse > 0) initialMode = "trueFalse"
+      }
+      setMode(initialMode)
+      
+      const next = getRandomQuestion(subjectId, initialMode)
+      setCurrentQuestion(next)
+      setSelectedAnswer("")
+      setSubmitted(false)
+      setCount(0)
     }
-  }, [single, multiple, trueFalse])
+  }, [subjectId]) // Removed single, multiple, trueFalse as they depend on subjectId
 
+  // Removed the secondary initialization effect that was causing race conditions
+  
+  // Save progress whenever it changes
   useEffect(() => {
-    if (!mounted) return
-    // Load first question when subject or mode ready
-    const next = getRandomQuestion(subjectId, mode)
-    setCurrentQuestion(next)
-    setSelectedAnswer("")
-    setSubmitted(false)
-    setCount(0)
-  }, [subjectId, mode, mounted])
+    if (!mounted || !currentQuestion) return
+    
+    const progress: RandomProgress = {
+      count,
+      mode,
+      currentQuestion,
+      submitted,
+      selectedAnswer,
+      lastUpdated: Date.now()
+    }
+    storage.setRandomProgress(subjectId, progress)
+  }, [count, mode, currentQuestion, submitted, selectedAnswer, subjectId, mounted])
 
   const handleAnswerSelect = (option: string) => {
     if (submitted) return
@@ -81,9 +107,24 @@ export default function RandomPage() {
     setCount(count + 1)
   }
 
+  const handleRestart = () => {
+    storage.clearRandomProgress(subjectId)
+    const next = getRandomQuestion(subjectId, mode)
+    setCurrentQuestion(next)
+    setSelectedAnswer("")
+    setSubmitted(false)
+    setCount(0)
+  }
+
   const handleModeChange = (newMode: "single" | "multiple" | "trueFalse") => {
+    // When changing mode, we should probably reset progress for the new mode or just continue count?
+    // User expectation is usually to continue the session but with new question type.
     setMode(newMode)
-    // Effect will handle loading question
+    const next = getRandomQuestion(subjectId, newMode)
+    setCurrentQuestion(next)
+    setSelectedAnswer("")
+    setSubmitted(false)
+    // We keep the count
   }
 
   if (!mounted) return null
@@ -119,7 +160,9 @@ export default function RandomPage() {
             <h1 className="font-semibold text-primary">随机刷题 - {subject?.name}</h1>
             <p className="text-xs text-muted-foreground">已做 {count} 题</p>
           </div>
-          <div className="w-10" />
+          <Button variant="ghost" size="sm" onClick={handleRestart} title="重新开始">
+            <RotateCcw className="w-4 h-4" />
+          </Button>
         </div>
 
         {/* Mode selector */}

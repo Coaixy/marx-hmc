@@ -25,11 +25,21 @@ export interface StudyProgress {
   lastUpdated: number
 }
 
+export interface RandomProgress {
+  count: number
+  mode: "single" | "multiple" | "trueFalse"
+  currentQuestion: { question: any; index: number } | null
+  submitted: boolean
+  selectedAnswer?: string
+  lastUpdated: number
+}
+
 const getStorageKey = (baseKey: string, subjectId: string) => `${baseKey}_${subjectId}`
 
 const STORAGE_KEYS = {
   WRONG_ANSWERS: "wrong_answers",
   STUDY_PROGRESS: "study_progress",
+  RANDOM_PROGRESS: "random_progress",
   EXAM_RESULTS: "exam_results",
   EXAM_RECORDS: "exam_records",
   SETTINGS: "app_settings"
@@ -101,6 +111,26 @@ export const storage = {
     if (typeof window === "undefined") return
     const key = getStorageKey(STORAGE_KEYS.STUDY_PROGRESS, subjectId)
     localStorage.setItem(key, JSON.stringify(progress))
+  },
+
+  // Random progress
+  getRandomProgress: (subjectId: string): RandomProgress | null => {
+    if (typeof window === "undefined") return null
+    const key = getStorageKey(STORAGE_KEYS.RANDOM_PROGRESS, subjectId)
+    const data = localStorage.getItem(key)
+    return data ? JSON.parse(data) : null
+  },
+
+  setRandomProgress: (subjectId: string, progress: RandomProgress) => {
+    if (typeof window === "undefined") return
+    const key = getStorageKey(STORAGE_KEYS.RANDOM_PROGRESS, subjectId)
+    localStorage.setItem(key, JSON.stringify(progress))
+  },
+
+  clearRandomProgress: (subjectId: string) => {
+    if (typeof window === "undefined") return
+    const key = getStorageKey(STORAGE_KEYS.RANDOM_PROGRESS, subjectId)
+    localStorage.removeItem(key)
   },
 
   // Exam results (Current temporary exam result)
