@@ -46,9 +46,20 @@ export default function ErrorsPage() {
   const currentQuestion = selectedAnswer ? getQuestionContent(selectedAnswer.type, selectedAnswer.questionIndex) : null
 
   const handleDelete = (id: string) => {
+    const currentIndex = filteredAnswers.findIndex((a) => a.id === id)
+    let nextId = ""
+    
+    if (filteredAnswers.length > 1) {
+      if (currentIndex < filteredAnswers.length - 1) {
+        nextId = filteredAnswers[currentIndex + 1].id
+      } else {
+        nextId = filteredAnswers[currentIndex - 1].id
+      }
+    }
+
     storage.removeWrongAnswer(subjectId, id)
     setWrongAnswers(storage.getWrongAnswers(subjectId))
-    setSelectedId("")
+    setSelectedId(nextId)
   }
 
   const handleClearAll = () => {
