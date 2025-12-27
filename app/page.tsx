@@ -136,7 +136,13 @@ export default function Home() {
                         : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                     )}
                   >
-                    {sub.id === 'marx' ? <GraduationCap className="w-4 h-4" /> : <BrainCircuit className="w-4 h-4" />}
+                    {sub.id === 'marx' ? (
+                      <GraduationCap className="w-4 h-4" />
+                    ) : sub.id === 'law' ? (
+                      <BookMarked className="w-4 h-4" />
+                    ) : (
+                      <BrainCircuit className="w-4 h-4" />
+                    )}
                     {sub.name}
                   </button>
                 ))}
