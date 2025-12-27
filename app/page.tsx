@@ -25,6 +25,7 @@ import { useSubject } from "@/components/subject-provider"
 import { SUBJECTS, type SubjectId } from "@/lib/question-data"
 import { AnnouncementDialog } from "@/components/announcement-dialog"
 import { CountdownTimer } from "@/components/countdown-timer"
+import { Fireworks } from "@/components/fireworks"
 import { cn } from "@/lib/utils"
 
 export default function Home() {
@@ -80,7 +81,8 @@ export default function Home() {
   const totalQuestions = single + multiple + trueFalse
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 p-4 md:p-8 pb-32 md:pb-32">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 p-4 md:p-8 pb-32 md:pb-32 relative">
+      <Fireworks />
       <Dialog open={showClearDialog} onOpenChange={setShowClearDialog}>
         <DialogContent>
           <DialogHeader>
@@ -100,7 +102,7 @@ export default function Home() {
         </DialogContent>
       </Dialog>
 
-      <div className="max-w-5xl mx-auto space-y-8">
+      <div className="max-w-5xl mx-auto space-y-8 relative z-10">
         {/* Modern Header Section */}
         <div className="relative overflow-hidden rounded-3xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl shadow-xl border border-white/20 dark:border-slate-800/50 p-3 md:p-4">
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 px-2">
@@ -109,9 +111,14 @@ export default function Home() {
                 <BrainCircuit className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">
-                  医学期末刷题
-                </h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">
+                    医学期末刷题
+                  </h2>
+                  <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 dark:bg-red-900/30 dark:text-red-400">
+                    2026 元旦快乐 🎉
+                  </span>
+                </div>
                 <p className="text-[10px] text-blue-500/80 dark:text-blue-400 uppercase tracking-wider font-bold">Medical Exam Prep</p>
               </div>
             </div>
