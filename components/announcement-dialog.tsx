@@ -34,9 +34,14 @@ export function AnnouncementDialog({ open, onOpenChange }: AnnouncementDialogPro
         <div className="flex-1 overflow-y-auto">
           <div className="space-y-4 py-2">
             <div className="text-sm text-slate-600 dark:text-slate-300 space-y-3">
+              <div className="bg-orange-50 dark:bg-orange-950/20 p-3 rounded-lg border border-orange-200 dark:border-orange-800">
+                <p className="font-semibold text-orange-700 dark:text-orange-300 mb-1">🔥 12.27 核心更新</p>
+                <p>• <strong>错题集联动</strong>：在顺序练习的“做题”模式下，回答错误的题目将<strong>自动同步至错题集</strong>，复习更精准！</p>
+              </div>
+
               <div className="bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg">
                 <p className="font-semibold text-amber-700 dark:text-amber-300 mb-1">📖 题库更新</p>
-                <p>• <strong>新增题库</strong>：新增《临床基础检验》题库</p>
+                <p>• <strong>新增题库</strong>：新增《临床基础检验》、《医事法学》题库</p>
                 <p>• <strong>全面适配</strong>：完美支持搜题、顺序练习、随机刷题及模拟考试</p>
               </div>
 

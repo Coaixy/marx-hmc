@@ -126,6 +126,27 @@ export default function SequentialPage() {
   const handleSubmit = () => {
     if (!selectedAnswer) return
     setSubmitted(true)
+
+    // Check answer and add to wrong questions if incorrect
+    const isCorrect = selectedAnswer === currentQuestion.答案
+    if (!isCorrect) {
+      const existingWrongAnswers = storage.getWrongAnswers(subjectId)
+      const isAlreadyWrong = existingWrongAnswers.some(
+        (r) => r.questionIndex === questionIndex && r.type === mode
+      )
+
+      if (!isAlreadyWrong) {
+        storage.addWrongAnswer(subjectId, {
+          id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9),
+          questionIndex: questionIndex,
+          type: mode,
+          userAnswer: selectedAnswer,
+          correctAnswer: currentQuestion.答案,
+          isCorrect: false,
+          timestamp: Date.now(),
+        })
+      }
+    }
   }
 
 
