@@ -11,8 +11,6 @@ const _notoChinese = Noto_Sans_SC({ subsets: ["latin"] })
 
 import { SubjectProvider } from "@/components/subject-provider"
 import { Toaster } from "@/components/ui/toaster"
-import { SnowEffect } from "@/components/snow-effect"
-import { ChristmasDecorations } from "@/components/christmas-decor"
 
 export const metadata: Metadata = {
   title: "综合刷题助手",
@@ -49,8 +47,6 @@ export default function RootLayout({
           {children}
           <BottomNavigation />
           <Toaster />
-          <SnowEffect />
-          <ChristmasDecorations />
         </SubjectProvider>
         <Analytics />
       </body>

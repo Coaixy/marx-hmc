@@ -26,25 +26,12 @@ import { SUBJECTS, type SubjectId } from "@/lib/question-data"
 import { AnnouncementDialog } from "@/components/announcement-dialog"
 import { CountdownTimer } from "@/components/countdown-timer"
 import { cn } from "@/lib/utils"
-import { ChristmasHat } from "@/components/christmas-decor"
-import { Snowflake } from "lucide-react"
 
 export default function Home() {
   const { subjectId, setSubjectId, subject } = useSubject()
   const { single, multiple, trueFalse } = getTotalQuestions(subjectId)
   const [showClearDialog, setShowClearDialog] = useState(false)
   const [showAnnouncement, setShowAnnouncement] = useState(false) // New state
-  const [showSnow, setShowSnow] = useState(true)
-
-  useEffect(() => {
-    setShowSnow(storage.getSettings().showSnow)
-  }, [])
-
-  const toggleSnow = () => {
-    const newVal = !showSnow
-    setShowSnow(newVal)
-    storage.updateSettings({ showSnow: newVal })
-  }
 
   const [examStats, setExamStats] = useState({
     bestScore: 0,
@@ -118,16 +105,14 @@ export default function Home() {
         <div className="relative overflow-hidden rounded-3xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl shadow-xl border border-white/20 dark:border-slate-800/50 p-3 md:p-4">
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 px-2">
             <div className="flex items-center gap-3">
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-rose-600 shadow-lg shadow-red-500/20">
-                <ChristmasHat className="absolute inset-0" />
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20">
                 <BrainCircuit className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-sm font-semibold text-slate-900 dark:text-white leading-tight flex items-center gap-1">
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">
                   医学期末刷题
-                  <span className="text-[10px] bg-red-500 text-white px-1 rounded animate-pulse">Merry Xmas!</span>
                 </h2>
-                <p className="text-[10px] text-red-500/80 dark:text-red-400 uppercase tracking-wider font-bold">Medical Exam Prep 🎄</p>
+                <p className="text-[10px] text-blue-500/80 dark:text-blue-400 uppercase tracking-wider font-bold">Medical Exam Prep</p>
               </div>
             </div>
 
@@ -149,19 +134,6 @@ export default function Home() {
                   </button>
                 ))}
               </div>
-              
-              <Button
-                variant="outline"
-                size="icon"
-                className={cn(
-                  "h-10 w-10 rounded-xl border-slate-200 dark:border-slate-800 shadow-sm transition-all shrink-0",
-                  showSnow ? "bg-red-50 dark:bg-red-900/20 text-red-600" : "bg-white dark:bg-slate-900 text-slate-400"
-                )}
-                onClick={toggleSnow}
-                title={showSnow ? "关闭雪花" : "开启雪花"}
-              >
-                 <Snowflake className={cn("w-4 h-4", showSnow && "animate-spin-slow")} />
-              </Button>
               
               <Button
                 variant="outline"
@@ -281,10 +253,8 @@ export default function Home() {
         {/* Footer */}
         <footer className="pt-8 text-center text-sm text-muted-foreground">
            <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="animate-bounce">🎄</span>
             <BrainCircuit className="w-4 h-4" />
-            <span>Made with ❤️ by 小奕神 | 🎅 圣诞快乐</span>
-            <span className="animate-bounce">🎁</span>
+            <span>Made with ❤️ by 小奕神</span>
            </div>
            <p className="text-xs opacity-70">微信：Nine_Palace</p>
         </footer>

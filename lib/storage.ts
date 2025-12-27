@@ -36,11 +36,9 @@ const STORAGE_KEYS = {
 }
 
 export interface AppSettings {
-  showSnow: boolean
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
-  showSnow: true
 }
 
 export const storage = {
