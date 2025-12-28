@@ -3,6 +3,7 @@
 import React, { useMemo } from "react"
 import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion } from "@/lib/question-data"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { highlightNegativeKeywords, NEGATIVE_KEYWORDS } from "@/lib/utils"
 
 interface QuestionCardProps {
   question: SingleChoiceQuestion | MultipleChoiceQuestion | TrueFalseQuestion
@@ -67,6 +68,23 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     return text.replace(regex, "").trim()
   }
 
+  const renderHighlightedText = (text: string) => {
+    if (!text) return ""
+    const parts = highlightNegativeKeywords(text)
+
+    if (typeof parts === "string") return parts
+
+    return parts.map((part, i) =>
+      NEGATIVE_KEYWORDS.includes(part) ? (
+        <span key={i} className="text-red-500 font-bold underline decoration-2 underline-offset-2">
+          {part}
+        </span>
+      ) : (
+        part
+      ),
+    )
+  }
+
   return (
     <Card className="w-full border-primary/20">
       <CardHeader>
@@ -88,7 +106,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         )}
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-base font-medium leading-relaxed">{question.题干}</p>
+        <p className="text-base font-medium leading-relaxed">{renderHighlightedText(question.题干)}</p>
 
         <div className="space-y-2">
           {options.map((option) => (
