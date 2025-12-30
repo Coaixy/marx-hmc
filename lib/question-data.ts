@@ -76,11 +76,11 @@ export const SUBJECTS = {
     name: '马克思主义基本原理',
     data: questionsData as QuestionBank
   },
-  bio: {
-    id: 'bio',
-    name: '生物化学',
-    data: bioData as unknown as QuestionBank
-  },
+  // bio: {
+  //   id: 'bio',
+  //   name: '生物化学',
+  //   data: bioData as unknown as QuestionBank
+  // },
   med_bio: {
     id: 'med_bio',
     name: '临床生物化学',

@@ -13,10 +13,28 @@ interface TimeLeft {
   isExpired: boolean
 }
 
+interface Exam {
+  name: string
+  date: string
+  displayDate: string
+}
+
+const EXAMS: Exam[] = [
+  { name: "医学检验报告单解读", date: "2025-12-29T13:30:00", displayDate: "12.29 13:30" },
+  { name: "生物化学", date: "2025-12-30T13:30:00", displayDate: "12.30 13:30" },
+  { name: "卫生法学与医学伦理", date: "2025-12-31T09:00:00", displayDate: "12.31 09:00" },
+  { name: "细胞生物学", date: "2026-01-04T12:05:00", displayDate: "1.4 12:05" },
+  { name: "临床基础检验", date: "2026-01-05T09:00:00", displayDate: "1.5 09:00" },
+  { name: "临床生物化学检验", date: "2026-01-06T16:30:00", displayDate: "1.6 16:30" },
+  { name: "马克思主义基本原理", date: "2026-01-07T16:30:00", displayDate: "1.7 16:30" },
+  { name: "大学英语", date: "2026-01-08T16:30:00", displayDate: "1.8 16:30" },
+  { name: "医学信息检索与利用", date: "2026-01-10T14:00:00", displayDate: "1.10 14:00" },
+]
+
 export function CountdownTimer() {
-  const targetDate = new Date("2025-12-29T13:30:00")
+  const [nextExam, setNextExam] = useState<Exam | null>(null)
   
-  const calculateTimeLeft = (): TimeLeft => {
+  const calculateTimeLeft = (targetDate: Date): TimeLeft => {
     const now = new Date()
     const difference = targetDate.getTime() - now.getTime()
     
@@ -33,17 +51,29 @@ export function CountdownTimer() {
     }
   }
 
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft())
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null)
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft())
-    }, 1000)
+    const updateCountdown = () => {
+      const now = new Date()
+      const upcoming = EXAMS.find(exam => new Date(exam.date).getTime() > now.getTime())
+      
+      if (upcoming) {
+        setNextExam(upcoming)
+        setTimeLeft(calculateTimeLeft(new Date(upcoming.date)))
+      } else {
+        setNextExam(null)
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true })
+      }
+    }
+
+    updateCountdown()
+    const timer = setInterval(updateCountdown, 1000)
 
     return () => clearInterval(timer)
   }, [])
 
-  if (timeLeft.isExpired) {
+  if (!timeLeft || timeLeft.isExpired) {
     return (
       <Card className="border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-950/20 shadow-sm overflow-hidden">
         <CardContent className="p-4 flex items-center justify-between">
@@ -52,8 +82,12 @@ export function CountdownTimer() {
               <Calendar className="w-5 h-5 text-red-600 dark:text-red-400" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-red-900 dark:text-red-100">考试已开始</p>
-              <p className="text-xs text-red-600 dark:text-red-400">祝各位旗开得胜！</p>
+              <p className="text-sm font-semibold text-red-900 dark:text-red-100">
+                {nextExam ? "考试已开始" : "所有考试已结束"}
+              </p>
+              <p className="text-xs text-red-600 dark:text-red-400">
+                {nextExam ? `当前：${nextExam.name}` : "祝各位假期愉快！"}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -71,9 +105,9 @@ export function CountdownTimer() {
             </div>
             <div>
               <h3 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                距离考试还有
+                距离 <span className="text-blue-600 dark:text-blue-400">{nextExam?.name}</span> 还有
                 <span className="text-xs font-normal text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
-                  12.29 13:30
+                  {nextExam?.displayDate}
                 </span>
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">抓紧时间，最后冲刺！</p>
