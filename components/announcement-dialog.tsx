@@ -20,10 +20,10 @@ interface AnnouncementDialogProps {
 export function AnnouncementDialog({ open, onOpenChange }: AnnouncementDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] flex flex-col glass-card">
         <DialogHeader className="shrink-0">
           <DialogTitle className="flex items-center gap-2">
-            <Megaphone className="w-5 h-5 text-blue-500" />
+            <Megaphone className="w-5 h-5 text-primary" />
             🎉 最新版本更新！
           </DialogTitle>
           <DialogDescription className="text-left pt-2">

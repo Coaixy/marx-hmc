@@ -75,17 +75,17 @@ export function CountdownTimer() {
 
   if (!timeLeft || timeLeft.isExpired) {
     return (
-      <Card className="border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-950/20 shadow-sm overflow-hidden">
+      <Card className="border-destructive/20 bg-destructive/5 shadow-sm overflow-hidden">
         <CardContent className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-              <Calendar className="w-5 h-5 text-red-600 dark:text-red-400" />
+            <div className="p-2 bg-destructive/10 rounded-lg">
+              <Calendar className="w-5 h-5 text-destructive" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-red-900 dark:text-red-100">
+              <p className="text-sm font-semibold text-destructive">
                 {nextExam ? "考试已开始" : "所有考试已结束"}
               </p>
-              <p className="text-xs text-red-600 dark:text-red-400">
+              <p className="text-xs text-destructive/80">
                 {nextExam ? `当前：${nextExam.name}` : "祝各位假期愉快！"}
               </p>
             </div>
@@ -96,25 +96,28 @@ export function CountdownTimer() {
   }
 
   return (
-    <Card className="border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-950/20 backdrop-blur-sm shadow-sm overflow-hidden">
-      <CardContent className="p-4 md:p-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-              <Timer className="w-5 h-5 text-blue-600 dark:text-blue-400 animate-pulse" />
+    <Card className="glass-card border-none bg-gradient-to-r from-primary/5 to-secondary/5 overflow-hidden relative group">
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
+      <CardContent className="p-5 md:p-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="p-3 bg-background rounded-2xl shadow-sm border border-border">
+              <Timer className="w-6 h-6 text-primary animate-pulse" />
             </div>
             <div>
-              <h3 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                距离 <span className="text-blue-600 dark:text-blue-400">{nextExam?.name}</span> 还有
-                <span className="text-xs font-normal text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+              <h3 className="font-bold text-lg text-foreground flex items-center gap-2 flex-wrap">
+                距离 <span className="text-primary underline decoration-2 decoration-primary/30 underline-offset-4">{nextExam?.name}</span> 还有
+              </h3>
+              <div className="flex items-center gap-2 mt-1">
+                 <span className="text-xs font-medium text-muted-foreground bg-background/50 px-2 py-0.5 rounded-md border border-border/50">
                   {nextExam?.displayDate}
                 </span>
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">抓紧时间，最后冲刺！</p>
+                <span className="text-xs text-muted-foreground/80">抓紧时间，最后冲刺！</span>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-2 md:gap-3">
             <TimeUnit value={timeLeft.days} label="天" />
             <TimeUnit value={timeLeft.hours} label="时" />
             <TimeUnit value={timeLeft.minutes} label="分" />
@@ -129,16 +132,16 @@ export function CountdownTimer() {
 function TimeUnit({ value, label, isLast = false }: { value: number, label: string, isLast?: boolean }) {
   return (
     <div className="flex items-center">
-      <div className="flex flex-col items-center">
-        <div className="bg-white dark:bg-slate-900 min-w-[40px] md:min-w-[48px] h-10 md:h-12 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
-          <span className="text-lg md:text-xl font-bold text-blue-600 dark:text-blue-400 tabular-nums">
+      <div className="flex flex-col items-center gap-1">
+        <div className="bg-background min-w-[44px] md:min-w-[56px] h-12 md:h-14 flex items-center justify-center rounded-xl border border-border shadow-inner ring-1 ring-border/50">
+          <span className="text-xl md:text-2xl font-bold bg-gradient-to-br from-primary to-primary/70 bg-clip-text text-transparent tabular-nums">
             {value.toString().padStart(2, '0')}
           </span>
         </div>
-        <span className="text-[10px] md:text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">{label}</span>
+        <span className="text-[10px] md:text-xs font-semibold text-muted-foreground uppercase tracking-wider">{label}</span>
       </div>
       {!isLast && (
-        <span className="mx-1 md:mx-2 text-slate-300 dark:text-slate-700 font-bold mb-5">:</span>
+        <span className="mx-1 md:mx-2 text-primary/30 font-bold text-xl mb-6 animate-pulse">:</span>
       )}
     </div>
   )

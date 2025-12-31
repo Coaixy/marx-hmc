@@ -36,13 +36,45 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     })
   }, [type, question])
 
-  const isCorrect = selectedAnswer === question.答案
+  const normalizedCorrectAnswer = useMemo(() => {
+    if (type !== 'trueFalse') return question.答案;
+    if (question.答案 === '√' || question.答案 === '正确') return 'A';
+    if (question.答案 === '×' || question.答案 === '错误') return 'B';
+    return question.答案;
+  }, [type, question.答案]);
+
+  const isCorrect = useMemo(() => {
+      if (type === 'multiple') {
+          return selectedAnswer === normalizedCorrectAnswer
+      }
+      // For true/false and single choice
+      // If selected answer is the raw answer (like "√"), normalize it for comparison
+      let normalizedSelected = selectedAnswer;
+      if (type === 'trueFalse') {
+         if (selectedAnswer === '√' || selectedAnswer === '正确') normalizedSelected = 'A';
+         else if (selectedAnswer === '×' || selectedAnswer === '错误') normalizedSelected = 'B';
+      }
+      
+      return normalizedSelected === normalizedCorrectAnswer
+  }, [selectedAnswer, normalizedCorrectAnswer, type])
+
   const showResultFeedback = submitted && selectedAnswer
 
   const getOptionStyle = (option: string) => {
-    const isSelected =
-      type === "multiple" ? selectedAnswer?.includes(option) : selectedAnswer === option
-    const isCorrectOption = question.答案.includes(option)
+    let isSelected = false;
+    
+    if (type === "multiple") {
+        isSelected = selectedAnswer?.includes(option) || false;
+    } else if (type === "trueFalse") {
+        // Handle cases where selectedAnswer might be passed as "√" (from search page) or "A" (from user click)
+        if (selectedAnswer === '√' || selectedAnswer === '正确') isSelected = option === 'A';
+        else if (selectedAnswer === '×' || selectedAnswer === '错误') isSelected = option === 'B';
+        else isSelected = selectedAnswer === option;
+    } else {
+        isSelected = selectedAnswer === option;
+    }
+
+    const isCorrectOption = normalizedCorrectAnswer.includes(option)
 
     if (submitted) {
       if (isCorrectOption) {
@@ -145,7 +177,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             <p className={showResultFeedback ? "text-sm mt-1" : "font-medium"}>
               正确答案：
               {type === "trueFalse"
-                ? question.答案 === "A"
+                ? normalizedCorrectAnswer === "A"
                   ? "√"
                   : "×"
                 : question.答案}

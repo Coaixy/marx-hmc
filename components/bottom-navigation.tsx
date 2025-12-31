@@ -44,7 +44,7 @@ export function BottomNavigation() {
 
   return (
     <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-      <nav className="relative flex items-center gap-1.5 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.08)] ring-1 ring-black/5 dark:ring-white/5 transition-all duration-300 hover:bg-white/90 dark:hover:bg-slate-900/90">
+      <nav className="relative flex items-center gap-1.5 p-1.5 rounded-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl shadow-black/5 ring-1 ring-black/5 transition-all duration-300">
         {navigationItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href
@@ -57,13 +57,13 @@ export function BottomNavigation() {
                 "relative flex items-center justify-center rounded-full transition-all duration-500 ease-in-out",
                 isActive
                   ? "text-white px-5 py-2.5"
-                  : "w-11 h-11 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
+                  : "w-11 h-11 text-muted-foreground hover:text-foreground hover:bg-muted/50"
               )}
             >
               {isActive && (
                 <motion.div
                   layoutId="active-pill"
-                  className="absolute inset-0 bg-blue-600 dark:bg-blue-500 rounded-full shadow-[0_2px_8px_rgba(37,99,235,0.4)]"
+                  className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/30"
                   transition={{
                     type: "spring",
                     stiffness: 160,
