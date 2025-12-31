@@ -15,8 +15,8 @@ import { useSubject } from "@/components/subject-provider"
 
 export default function SequentialPage() {
   const { subjectId, subject } = useSubject()
-  const { single, multiple, trueFalse } = getTotalQuestions(subjectId)
-  const [mode, setMode] = useState<"single" | "multiple" | "trueFalse">("single")
+  const { single, multiple, trueFalse, matching } = getTotalQuestions(subjectId)
+  const [mode, setMode] = useState<"single" | "multiple" | "trueFalse" | "matching">("single")
   const [questionIndex, setQuestionIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string>()
   const [submitted, setSubmitted] = useState(true)
@@ -29,10 +29,11 @@ export default function SequentialPage() {
     const progress = storage.getProgress(subjectId)
     
     // Default to 'single' if available, otherwise try others
-    let initialMode: "single" | "multiple" | "trueFalse" = "single"
+    let initialMode: "single" | "multiple" | "trueFalse" | "matching" = "single"
     if (single === 0) {
       if (multiple > 0) initialMode = "multiple"
       else if (trueFalse > 0) initialMode = "trueFalse"
+      else if (matching > 0) initialMode = "matching"
     }
     setMode(initialMode)
 
@@ -40,14 +41,16 @@ export default function SequentialPage() {
       setQuestionIndex(progress.singleIndex)
     } else if (initialMode === "multiple") {
       setQuestionIndex(progress.multipleIndex)
-    } else {
+    } else if (initialMode === "trueFalse") {
       setQuestionIndex(progress.trueFalseIndex)
+    } else {
+      setQuestionIndex(progress.matchingIndex)
     }
     
     // Reset state
     setSelectedAnswer("")
     setSubmitted(isReciteMode)
-  }, [subjectId, single, multiple, trueFalse, isReciteMode])
+  }, [subjectId, single, multiple, trueFalse, matching, isReciteMode])
 
   useEffect(() => {
     if (!mounted) return
@@ -56,8 +59,10 @@ export default function SequentialPage() {
       setQuestionIndex(progress.singleIndex)
     } else if (mode === "multiple") {
       setQuestionIndex(progress.multipleIndex)
-    } else {
+    } else if (mode === "trueFalse") {
       setQuestionIndex(progress.trueFalseIndex)
+    } else {
+      setQuestionIndex(progress.matchingIndex)
     }
     setSelectedAnswer("")
     setSubmitted(isReciteMode)
@@ -86,15 +91,17 @@ export default function SequentialPage() {
       progress.singleIndex = newIndex
     } else if (mode === "multiple") {
       progress.multipleIndex = newIndex
-    } else {
+    } else if (mode === "trueFalse") {
       progress.trueFalseIndex = newIndex
+    } else {
+      progress.matchingIndex = newIndex
     }
     progress.lastUpdated = Date.now()
     storage.setProgress(subjectId, progress)
   }
 
   const currentQuestion = getSequentialQuestion(subjectId, mode, questionIndex)
-  const maxQuestions = mode === "single" ? single : mode === "multiple" ? multiple : trueFalse
+  const maxQuestions = mode === "single" ? single : mode === "multiple" ? multiple : mode === "trueFalse" ? trueFalse : matching
 
   const handleNext = () => {
     if (questionIndex + 1 < maxQuestions) {
@@ -128,8 +135,8 @@ export default function SequentialPage() {
     setSubmitted(true)
 
     // Check answer and add to wrong questions if incorrect
-    const isCorrect = selectedAnswer === currentQuestion.答案
-    if (!isCorrect) {
+    const isCorrect = selectedAnswer === currentQuestion?.答案
+    if (!isCorrect && currentQuestion) {
       const existingWrongAnswers = storage.getWrongAnswers(subjectId)
       const isAlreadyWrong = existingWrongAnswers.some(
         (r) => r.questionIndex === questionIndex && r.type === mode
@@ -171,6 +178,16 @@ export default function SequentialPage() {
     )
   }
 
+  const getModeLabel = () => {
+      switch (mode) {
+          case "single": return "单选题"
+          case "multiple": return "多选题"
+          case "trueFalse": return "判断题"
+          case "matching": return "匹配题"
+          default: return ""
+      }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 p-4 pb-48">
       <div className="max-w-md mx-auto pt-4">
@@ -205,7 +222,7 @@ export default function SequentialPage() {
               current={questionIndex}
               answered={new Set(Array.from({ length: questionIndex }, (_, i) => i))}
               onJump={handleJump}
-              title={`${mode === "single" ? "单选题" : mode === "multiple" ? "多选题" : "判断题"}答题卡`}
+              title={`${getModeLabel()}答题卡`}
             />
           </div>
         </div>
@@ -240,6 +257,16 @@ export default function SequentialPage() {
               className="flex-1"
             >
               判断题
+            </Button>
+          )}
+           {matching > 0 && (
+            <Button
+              variant={mode === "matching" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMode("matching")}
+              className="flex-1"
+            >
+              匹配题
             </Button>
           )}
         </div>
@@ -288,4 +315,3 @@ export default function SequentialPage() {
     </div>
   )
 }
-

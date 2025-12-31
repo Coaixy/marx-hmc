@@ -1,7 +1,7 @@
 export interface AnswerRecord {
   id: string
   questionIndex: number
-  type: "single" | "multiple" | "trueFalse"
+  type: "single" | "multiple" | "trueFalse" | "matching"
   userAnswer: string
   correctAnswer: string
   isCorrect: boolean
@@ -22,12 +22,13 @@ export interface StudyProgress {
   singleIndex: number
   multipleIndex: number
   trueFalseIndex: number
+  matchingIndex: number
   lastUpdated: number
 }
 
 export interface RandomProgress {
   count: number
-  mode: "single" | "multiple" | "trueFalse"
+  mode: "single" | "multiple" | "trueFalse" | "matching"
   currentQuestion: { question: any; index: number } | null
   submitted: boolean
   selectedAnswer?: string
@@ -101,10 +102,11 @@ export const storage = {
 
   // Study progress
   getProgress: (subjectId: string): StudyProgress => {
-    if (typeof window === "undefined") return { singleIndex: 0, multipleIndex: 0, trueFalseIndex: 0, lastUpdated: 0 }
+    if (typeof window === "undefined") return { singleIndex: 0, multipleIndex: 0, trueFalseIndex: 0, matchingIndex: 0, lastUpdated: 0 }
     const key = getStorageKey(STORAGE_KEYS.STUDY_PROGRESS, subjectId)
     const data = localStorage.getItem(key)
-    return data ? JSON.parse(data) : { singleIndex: 0, multipleIndex: 0, trueFalseIndex: 0, lastUpdated: Date.now() }
+    const defaultProgress = { singleIndex: 0, multipleIndex: 0, trueFalseIndex: 0, matchingIndex: 0, lastUpdated: Date.now() }
+    return data ? { ...defaultProgress, ...JSON.parse(data) } : defaultProgress
   },
 
   setProgress: (subjectId: string, progress: StudyProgress) => {

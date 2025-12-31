@@ -1,15 +1,15 @@
 "use client"
 
 import React, { useMemo } from "react"
-import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion } from "@/lib/question-data"
+import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion, MatchingQuestion } from "@/lib/question-data"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { highlightNegativeKeywords, NEGATIVE_KEYWORDS } from "@/lib/utils"
+import { highlightNegativeKeywords, NEGATIVE_KEYWORDS, parseMatchingOptions } from "@/lib/utils"
 
 interface QuestionCardProps {
-  question: SingleChoiceQuestion | MultipleChoiceQuestion | TrueFalseQuestion
+  question: SingleChoiceQuestion | MultipleChoiceQuestion | TrueFalseQuestion | MatchingQuestion
   questionNumber: number
   totalQuestions: number
-  type: "single" | "multiple" | "trueFalse"
+  type: "single" | "multiple" | "trueFalse" | "matching"
   onAnswerSelect: (answer: string) => void
   selectedAnswer?: string
   submitted?: boolean
@@ -24,8 +24,19 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   selectedAnswer,
   submitted = false,
 }) => {
+  const parsedMatchingOptions = useMemo(() => {
+    if (type === "matching") {
+      return parseMatchingOptions((question as MatchingQuestion).选项)
+    }
+    return {}
+  }, [question, type])
+
   const options = useMemo(() => {
     if (type === "trueFalse") return ["A", "B"]
+    
+    if (type === "matching") {
+      return Object.keys(parsedMatchingOptions).sort()
+    }
     
     // Generate options dynamically (A, B, C, D, E, F...)
     // Checks which keys exist in the question object
@@ -34,7 +45,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       const val = (question as any)[opt]
       return typeof val === "string" && val.trim().length > 0
     })
-  }, [type, question])
+  }, [type, question, parsedMatchingOptions])
 
   const normalizedCorrectAnswer = useMemo(() => {
     if (type !== 'trueFalse') return question.答案;
@@ -47,7 +58,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       if (type === 'multiple') {
           return selectedAnswer === normalizedCorrectAnswer
       }
-      // For true/false and single choice
+      // For true/false, single choice and matching
       // If selected answer is the raw answer (like "√"), normalize it for comparison
       let normalizedSelected = selectedAnswer;
       if (type === 'trueFalse') {
@@ -117,15 +128,25 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     )
   }
 
+  const getQuestionTypeLabel = () => {
+    switch (type) {
+      case "single": return "单选题"
+      case "multiple": return "多选题"
+      case "trueFalse": return "判断题"
+      case "matching": return "匹配题"
+      default: return ""
+    }
+  }
+
   return (
     <Card className="w-full border-primary/20">
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg">
-            {type === "single" ? "单选题" : type === "multiple" ? "多选题" : "判断题"} {questionNumber}
+            {getQuestionTypeLabel()} {questionNumber}
             /{totalQuestions}
           </CardTitle>
-          {type !== "trueFalse" && (
+          {type !== "trueFalse" && type !== "matching" && (
             <span className="text-sm px-3 py-1 bg-secondary rounded-full">
               {(question as SingleChoiceQuestion | MultipleChoiceQuestion).难度}
             </span>
@@ -133,7 +154,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         </div>
         {type !== "trueFalse" && (
           <p className="text-sm text-muted-foreground mt-2">
-            {(question as SingleChoiceQuestion | MultipleChoiceQuestion).章节}
+            {(question as any).章节}
           </p>
         )}
       </CardHeader>
@@ -155,7 +176,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 ? option === "A"
                   ? "√"
                   : "×"
-                : getOptionText(
+                : type === "matching"
+                  ? parsedMatchingOptions[option]
+                  : getOptionText(
                     (question as any)[option],
                     option
                   )}

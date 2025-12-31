@@ -58,8 +58,6 @@ export function HomeHeader({ onAnnouncementClick }: HomeHeaderProps) {
             >
               {sub.id === 'marx' ? (
                 <GraduationCap className="w-4 h-4" />
-              ) : sub.id === 'law' ? (
-                <BookMarked className="w-4 h-4" />
               ) : (
                 <BrainCircuit className="w-4 h-4" />
               )}
@@ -80,4 +78,3 @@ export function HomeHeader({ onAnnouncementClick }: HomeHeaderProps) {
     </div>
   )
 }
-

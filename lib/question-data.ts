@@ -27,13 +27,21 @@ export interface TrueFalseQuestion {
   答案: string
 }
 
+export interface MatchingQuestion {
+  章节: string
+  题干: string
+  选项: string
+  答案: string
+}
+
 // 联合类型，兼容现有的使用方式
-export type Question = SingleChoiceQuestion | MultipleChoiceQuestion
+export type Question = SingleChoiceQuestion | MultipleChoiceQuestion | MatchingQuestion
 
 export interface QuestionBank {
   判断题: TrueFalseQuestion[]
   单选题: SingleChoiceQuestion[]
   多选题: MultipleChoiceQuestion[]
+  匹配题?: MatchingQuestion[]
 }
 
 import questionsData from './marix.json'
@@ -41,6 +49,7 @@ import bioData from './bio.json'
 import medBioData from './med_bio.json'
 import clinicalData from './clinical.json'
 import lawData from './law.json'
+import cellData from './cell.json'
 
 // 处理 med_bio 数据，将其转换为标准格式
 const processMedBioData = (data: any[]): QuestionBank => {
@@ -81,6 +90,11 @@ export const SUBJECTS = {
   //   name: '生物化学',
   //   data: bioData as unknown as QuestionBank
   // },
+  cell: {
+    id: 'cell',
+    name: '细胞生物学',
+    data: cellData as unknown as QuestionBank
+  },
   med_bio: {
     id: 'med_bio',
     name: '临床生物化学',
@@ -91,11 +105,11 @@ export const SUBJECTS = {
     name: '临床基础检验',
     data: clinicalData as unknown as QuestionBank
   },
-  law: {
-    id: 'law',
-    name: '医事法学',
-    data: lawData as unknown as QuestionBank
-  }
+  // law: {
+  //   id: 'law',
+  //   name: '医事法学',
+  //   data: lawData as unknown as QuestionBank
+  // }
 } as const
 
 export type SubjectId = keyof typeof SUBJECTS
@@ -104,4 +118,3 @@ export const DEFAULT_SUBJECT: SubjectId = 'marx'
 export const getQuestionBank = (subjectId: string): QuestionBank => {
   return SUBJECTS[subjectId as SubjectId]?.data || SUBJECTS.marx.data
 }
-

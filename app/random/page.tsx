@@ -11,8 +11,8 @@ import { useSubject } from "@/components/subject-provider"
 
 export default function RandomPage() {
   const { subjectId, subject } = useSubject()
-  const { single, multiple, trueFalse } = getTotalQuestions(subjectId)
-  const [mode, setMode] = useState<"single" | "multiple" | "trueFalse">("single")
+  const { single, multiple, trueFalse, matching } = getTotalQuestions(subjectId)
+  const [mode, setMode] = useState<"single" | "multiple" | "trueFalse" | "matching">("single")
   const [currentQuestion, setCurrentQuestion] = useState<{ question: any; index: number } | null>(null)
   const [selectedAnswer, setSelectedAnswer] = useState<string>()
   const [submitted, setSubmitted] = useState(false)
@@ -32,10 +32,11 @@ export default function RandomPage() {
       setSelectedAnswer(saved.selectedAnswer || "")
     } else {
       // Determine initial mode
-      let initialMode: "single" | "multiple" | "trueFalse" = "single"
+      let initialMode: "single" | "multiple" | "trueFalse" | "matching" = "single"
       if (single === 0) {
         if (multiple > 0) initialMode = "multiple"
         else if (trueFalse > 0) initialMode = "trueFalse"
+        else if (matching > 0) initialMode = "matching"
       }
       setMode(initialMode)
       
@@ -45,9 +46,8 @@ export default function RandomPage() {
       setSubmitted(false)
       setCount(0)
     }
-  }, [subjectId]) // Removed single, multiple, trueFalse as they depend on subjectId
+  }, [subjectId, single, multiple, trueFalse, matching]) 
 
-  // Removed the secondary initialization effect that was causing race conditions
   
   // Save progress whenever it changes
   useEffect(() => {
@@ -116,9 +116,7 @@ export default function RandomPage() {
     setCount(0)
   }
 
-  const handleModeChange = (newMode: "single" | "multiple" | "trueFalse") => {
-    // When changing mode, we should probably reset progress for the new mode or just continue count?
-    // User expectation is usually to continue the session but with new question type.
+  const handleModeChange = (newMode: "single" | "multiple" | "trueFalse" | "matching") => {
     setMode(newMode)
     const next = getRandomQuestion(subjectId, newMode)
     setCurrentQuestion(next)
@@ -144,6 +142,16 @@ export default function RandomPage() {
         </div>
       </div>
     )
+  }
+
+  const getTotalForMode = () => {
+      switch (mode) {
+          case "single": return single;
+          case "multiple": return multiple;
+          case "trueFalse": return trueFalse;
+          case "matching": return matching;
+          default: return 0;
+      }
   }
 
   return (
@@ -197,6 +205,16 @@ export default function RandomPage() {
               判断题
             </Button>
           )}
+          {matching > 0 && (
+            <Button
+              variant={mode === "matching" ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleModeChange("matching")}
+              className="flex-1"
+            >
+              匹配题
+            </Button>
+          )}
         </div>
 
         {/* Question */}
@@ -204,7 +222,7 @@ export default function RandomPage() {
           <QuestionCard
             question={currentQuestion.question}
             questionNumber={count + 1}
-            totalQuestions={mode === "single" ? single : mode === "multiple" ? multiple : trueFalse}
+            totalQuestions={getTotalForMode()}
             type={mode}
             onAnswerSelect={handleAnswerSelect}
             selectedAnswer={selectedAnswer}
