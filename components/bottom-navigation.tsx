@@ -42,6 +42,10 @@ const navigationItems = [
 export function BottomNavigation() {
   const pathname = usePathname()
 
+  if (pathname === "/new-year") {
+    return null
+  }
+
   return (
     <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
       <nav className="relative flex items-center gap-1.5 p-1.5 rounded-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl shadow-black/5 ring-1 ring-black/5 transition-all duration-300">
