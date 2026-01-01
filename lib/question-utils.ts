@@ -68,7 +68,7 @@ export const getRandomQuestion = (subjectId: string, type: "single" | "multiple"
 
 export const getExamQuestions = (subjectId: string) => {
   const bank = getQuestionBank(subjectId)
-  
+
   const singleQuestions = (bank.单选题 || []).sort(() => Math.random() - 0.5).slice(0, 25)
   const multipleQuestions = (bank.多选题 || []).sort(() => Math.random() - 0.5).slice(0, 5)
   const trueFalseQuestions = (bank.判断题 || [])
@@ -84,11 +84,13 @@ export const getExamQuestions = (subjectId: string) => {
     }))
     .sort(() => Math.random() - 0.5)
     .slice(0, 10)
-    
-  // Currently not including matching questions in exam to keep existing structure
-  // Can be added later if needed
-  
-  return { singleQuestions, multipleQuestions, trueFalseQuestions }
+
+  // Include matching questions if available (up to 5 questions)
+  const matchingQuestions = (bank.匹配题 || [])
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 5)
+
+  return { singleQuestions, multipleQuestions, trueFalseQuestions, matchingQuestions }
 }
 
 export const getTotalQuestions = (subjectId: string) => {

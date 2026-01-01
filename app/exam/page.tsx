@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getExamQuestions } from "@/lib/question-utils"
 import { storage } from "@/lib/storage"
 import { ChevronLeft, Home } from "lucide-react"
-import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion } from "@/lib/question-data"
+import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion, MatchingQuestion } from "@/lib/question-data"
 import type { AnswerRecord } from "@/lib/storage"
 import { AnswerSheet } from "@/components/answer-sheet"
 import { useSubject } from "@/components/subject-provider"
@@ -16,8 +16,8 @@ import { useSubject } from "@/components/subject-provider"
 export default function ExamPage() {
   const { subjectId, subject } = useSubject()
   const [examStarted, setExamStarted] = useState(false)
-  const [examData, setExamData] = useState<{ singleQuestions: SingleChoiceQuestion[]; multipleQuestions: MultipleChoiceQuestion[]; trueFalseQuestions: TrueFalseQuestion[] } | null>(null)
-  const [currentPhase, setCurrentPhase] = useState<"single" | "multiple" | "trueFalse">("single")
+  const [examData, setExamData] = useState<{ singleQuestions: SingleChoiceQuestion[]; multipleQuestions: MultipleChoiceQuestion[]; trueFalseQuestions: TrueFalseQuestion[]; matchingQuestions: MatchingQuestion[] } | null>(null)
+  const [currentPhase, setCurrentPhase] = useState<"single" | "multiple" | "trueFalse" | "matching">("single")
   const [questionIndex, setQuestionIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string>()
   const [submitted, setSubmitted] = useState(false)
@@ -59,12 +59,13 @@ export default function ExamPage() {
     setExamStarted(true)
     setAnswers(new Map())
     setWrongAnswerCount(0)
-    
+
     // Determine start phase
     if (data.singleQuestions.length > 0) setCurrentPhase("single")
     else if (data.multipleQuestions.length > 0) setCurrentPhase("multiple")
-    else setCurrentPhase("trueFalse")
-    
+    else if (data.trueFalseQuestions.length > 0) setCurrentPhase("trueFalse")
+    else if (data.matchingQuestions.length > 0) setCurrentPhase("matching")
+
     setQuestionIndex(0)
   }
 
@@ -73,12 +74,15 @@ export default function ExamPage() {
       ? examData.singleQuestions[questionIndex]
       : currentPhase === "multiple"
         ? examData.multipleQuestions[questionIndex]
-        : examData.trueFalseQuestions[questionIndex]
+        : currentPhase === "trueFalse"
+          ? examData.trueFalseQuestions[questionIndex]
+          : examData.matchingQuestions[questionIndex]
     : null
 
   const totalSingle = examData?.singleQuestions.length || 0
   const totalMultiple = examData?.multipleQuestions.length || 0
   const totalTrueFalse = examData?.trueFalseQuestions.length || 0
+  const totalMatching = examData?.matchingQuestions.length || 0
 
   const handleSubmit = () => {
     if (!selectedAnswer) return
@@ -119,6 +123,9 @@ export default function ExamPage() {
             } else if (totalTrueFalse > 0) {
                 setCurrentPhase("trueFalse")
                 setQuestionIndex(0)
+            } else if (totalMatching > 0) {
+                setCurrentPhase("matching")
+                setQuestionIndex(0)
             } else {
                 finishExam()
             }
@@ -131,6 +138,9 @@ export default function ExamPage() {
             if (totalTrueFalse > 0) {
                 setCurrentPhase("trueFalse")
                 setQuestionIndex(0)
+            } else if (totalMatching > 0) {
+                setCurrentPhase("matching")
+                setQuestionIndex(0)
             } else {
                 finishExam()
             }
@@ -138,6 +148,18 @@ export default function ExamPage() {
     } else if (currentPhase === "trueFalse") {
         if (questionIndex + 1 < totalTrueFalse) {
              setQuestionIndex(questionIndex + 1)
+        } else {
+            // Try move to matching
+            if (totalMatching > 0) {
+                setCurrentPhase("matching")
+                setQuestionIndex(0)
+            } else {
+                finishExam()
+            }
+        }
+    } else if (currentPhase === "matching") {
+        if (questionIndex + 1 < totalMatching) {
+            setQuestionIndex(questionIndex + 1)
         } else {
             finishExam()
         }
@@ -147,7 +169,7 @@ export default function ExamPage() {
   const handleJump = (globalIndex: number) => {
     // Need to map global index to phase + index
     if (!examData) return
-    
+
     let remaining = globalIndex
     if (remaining < totalSingle) {
         setCurrentPhase("single")
@@ -155,16 +177,23 @@ export default function ExamPage() {
         return
     }
     remaining -= totalSingle
-    
+
     if (remaining < totalMultiple) {
         setCurrentPhase("multiple")
         setQuestionIndex(remaining)
         return
     }
     remaining -= totalMultiple
-    
+
     if (remaining < totalTrueFalse) {
         setCurrentPhase("trueFalse")
+        setQuestionIndex(remaining)
+        return
+    }
+    remaining -= totalTrueFalse
+
+    if (remaining < totalMatching) {
+        setCurrentPhase("matching")
         setQuestionIndex(remaining)
         return
     }
@@ -240,11 +269,32 @@ export default function ExamPage() {
       }
     })
 
+    // Matching answers
+    examData.matchingQuestions.forEach((q, idx) => {
+      const key = `matching-${idx}`
+      const userAnswer = answers.get(key) || ""
+      const isCorrect = userAnswer === q.答案
+      if (!isCorrect) {
+        incorrectCount++
+        results.push({
+          id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9),
+          questionIndex: idx,
+          type: "matching" as const,
+          userAnswer,
+          correctAnswer: q.答案,
+          isCorrect: false,
+          timestamp: Date.now(),
+        })
+      } else {
+        correctCount++
+      }
+    })
+
     // Save wrong answers
     results.forEach((r) => storage.addWrongAnswer(subjectId, r))
 
     // Save exam record
-    const totalQuestions = totalSingle + totalMultiple + totalTrueFalse
+    const totalQuestions = totalSingle + totalMultiple + totalTrueFalse + totalMatching
     const accuracy = Math.round((correctCount / totalQuestions) * 100)
     storage.saveExamRecord(subjectId, {
       id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9),
@@ -258,12 +308,12 @@ export default function ExamPage() {
     setShowResult(true)
   }
 
-  const getPhaseProgress = (phase: "single" | "multiple" | "trueFalse", total: number) => {
+  const getPhaseProgress = (phase: "single" | "multiple" | "trueFalse" | "matching", total: number) => {
     if (total === 0) return 0
     if (currentPhase === phase) {
       return Math.min(questionIndex + 1, total)
     }
-    const order = ["single", "multiple", "trueFalse"]
+    const order = ["single", "multiple", "trueFalse", "matching"]
     if (order.indexOf(currentPhase) > order.indexOf(phase)) {
       return total
     }
@@ -292,7 +342,8 @@ export default function ExamPage() {
                   <li>• 单选题：25道</li>
                   <li>• 多选题：5道</li>
                   <li>• 判断题：10道</li>
-                  <li>• 共计：40题</li>
+                  <li>• 匹配题：最多5道（如题库有）</li>
+                  <li>• 共计：最多45题</li>
                   <li>• 随机抽取，每次不同</li>
                   <li className="text-xs italic pt-1 text-muted-foreground/80">*如某题型不足将调整数量</li>
                 </ul>
@@ -308,7 +359,7 @@ export default function ExamPage() {
   }
 
   if (showResult) {
-    const totalQuestions = totalSingle + totalMultiple + totalTrueFalse
+    const totalQuestions = totalSingle + totalMultiple + totalTrueFalse + totalMatching
     const totalCorrect = totalQuestions - wrongAnswerCount
     const accuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0
 
@@ -364,8 +415,8 @@ export default function ExamPage() {
     return null
   }
 
-  const currentNumber = currentPhase === "single" ? questionIndex + 1 : currentPhase === "multiple" ? totalSingle + questionIndex + 1 : totalSingle + totalMultiple + questionIndex + 1
-  const totalQuestions = totalSingle + totalMultiple + totalTrueFalse
+  const currentNumber = currentPhase === "single" ? questionIndex + 1 : currentPhase === "multiple" ? totalSingle + questionIndex + 1 : currentPhase === "trueFalse" ? totalSingle + totalMultiple + questionIndex + 1 : totalSingle + totalMultiple + totalTrueFalse + questionIndex + 1
+  const totalQuestions = totalSingle + totalMultiple + totalTrueFalse + totalMatching
 
   const answeredIndices = new Set<number>()
   answers.forEach((_, key) => {
@@ -374,6 +425,7 @@ export default function ExamPage() {
     let globalIndex = idx
     if (phase === "multiple") globalIndex += totalSingle
     if (phase === "trueFalse") globalIndex += totalSingle + totalMultiple
+    if (phase === "matching") globalIndex += totalSingle + totalMultiple + totalTrueFalse
     answeredIndices.add(globalIndex)
   })
 
@@ -404,7 +456,7 @@ export default function ExamPage() {
 
         {/* Progress */}
         <div className="mb-4 p-3 bg-secondary/20 rounded-lg">
-          <div className="grid grid-cols-3 gap-2 text-sm mb-2">
+          <div className="grid grid-cols-4 gap-2 text-sm mb-2">
             <span>
               单选题：{getPhaseProgress("single", totalSingle)}/
               {totalSingle}
@@ -415,6 +467,9 @@ export default function ExamPage() {
             </span>
             <span>
               判断题：{getPhaseProgress("trueFalse", totalTrueFalse)}/{totalTrueFalse}
+            </span>
+            <span>
+              匹配题：{getPhaseProgress("matching", totalMatching)}/{totalMatching}
             </span>
           </div>
           <div className="w-full bg-border rounded-full h-2">
