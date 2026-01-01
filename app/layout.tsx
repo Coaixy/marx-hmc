@@ -42,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={`font-sans antialiased`}>
+      <body className={`font-sans antialiased min-h-screen pb-20`}>
         <SubjectProvider>
           {children}
           <BottomNavigation />

@@ -157,6 +157,9 @@
 }
 
 @layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
   .animate-spin-slow {
     animation: spin 8s linear infinite;
   }

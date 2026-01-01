@@ -47,8 +47,8 @@ export function BottomNavigation() {
   }
 
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-      <nav className="relative flex items-center gap-1.5 p-1.5 rounded-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl shadow-black/5 ring-1 ring-black/5 transition-all duration-300">
+    <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t border-black/[0.03] dark:border-white/[0.05] shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.05)]">
+      <nav className="relative flex items-center justify-around px-2 py-3">
         {navigationItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href
@@ -58,53 +58,45 @@ export function BottomNavigation() {
               key={item.href}
               href={item.href}
               className={cn(
-                "relative flex items-center justify-center rounded-full transition-all duration-500 ease-in-out",
-                isActive
-                  ? "text-white px-5 py-2.5"
-                  : "w-11 h-11 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                "relative flex flex-col items-center justify-center min-w-[60px] px-1 py-1 rounded-xl transition-colors duration-300 group",
+                isActive ? "text-primary" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
               )}
             >
               {isActive && (
                 <motion.div
-                  layoutId="active-pill"
-                  className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/30"
+                  layoutId="nav-pill"
+                  className="absolute inset-0 bg-primary/10 dark:bg-primary/20 rounded-xl"
                   transition={{
                     type: "spring",
-                    stiffness: 160,
-                    damping: 22,
+                    stiffness: 300,
+                    damping: 30,
                   }}
-                >
-                    {/* Subtle sheen */}
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/5 to-white/10" />
-                </motion.div>
+                />
               )}
               
-              <div className="relative z-10 flex items-center gap-1.5">
-                <Icon 
-                  className={cn(
-                    "w-5 h-5 transition-transform duration-300", 
-                    isActive && "scale-105" 
-                  )} 
-                  strokeWidth={isActive ? 2.5 : 2} 
-                />
-                
-                <motion.span
-                  initial={false}
-                  animate={{
-                    width: isActive ? "auto" : 0,
-                    opacity: isActive ? 1 : 0,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 180,
-                    damping: 24,
-                  }}
-                  className="overflow-hidden whitespace-nowrap"
-                >
-                  <span className="text-sm font-medium tracking-tight block pl-0.5">
-                    {item.label}
-                  </span>
-                </motion.span>
+              <div className="relative z-10 flex flex-col items-center gap-1">
+                <div className="relative">
+                  <Icon 
+                    className={cn(
+                      "w-6 h-6 transition-all duration-500 ease-out", 
+                      isActive && "fill-current scale-110 drop-shadow-sm" 
+                    )} 
+                    strokeWidth={isActive ? 2.5 : 2} 
+                  />
+                  {isActive && (
+                    <motion.div
+                      layoutId="nav-glow"
+                      className="absolute inset-0 blur-lg bg-primary/40 rounded-full"
+                      transition={{ duration: 0.3 }}
+                    />
+                  )}
+                </div>
+                <span className={cn(
+                  "text-[10px] font-medium tracking-wide transition-all duration-300",
+                  isActive ? "opacity-100 font-semibold translate-y-0" : "opacity-70 group-hover:opacity-100 translate-y-0.5"
+                )}>
+                  {item.label}
+                </span>
               </div>
             </Link>
           )
