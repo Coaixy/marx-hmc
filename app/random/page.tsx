@@ -4,20 +4,33 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { QuestionCard } from "@/components/question-card"
 import { Button } from "@/components/ui/button"
-import { getRandomQuestion, getTotalQuestions } from "@/lib/question-utils"
+import { getTotalQuestions, getSequentialQuestion } from "@/lib/question-utils"
 import { storage, type RandomProgress } from "@/lib/storage"
 import { ChevronLeft, Shuffle, Home, RotateCcw } from "lucide-react"
 import { useSubject } from "@/components/subject-provider"
 
+// Fisher-Yates shuffle
+function shuffleArray(array: number[]) {
+  const newArray = [...array]
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]]
+  }
+  return newArray
+}
+
 export default function RandomPage() {
   const { subjectId, subject } = useSubject()
-  const { single, multiple, trueFalse, matching } = getTotalQuestions(subjectId)
+  const totals = getTotalQuestions(subjectId)
+  const { single, multiple, trueFalse, matching } = totals
   const [mode, setMode] = useState<"single" | "multiple" | "trueFalse" | "matching">("single")
   const [currentQuestion, setCurrentQuestion] = useState<{ question: any; index: number } | null>(null)
   const [selectedAnswer, setSelectedAnswer] = useState<string>()
   const [submitted, setSubmitted] = useState(false)
   const [count, setCount] = useState(0)
   const [mounted, setMounted] = useState(false)
+  const [shuffledIndices, setShuffledIndices] = useState<number[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
     setMounted(true)
@@ -30,6 +43,8 @@ export default function RandomPage() {
       setCount(saved.count)
       setSubmitted(saved.submitted)
       setSelectedAnswer(saved.selectedAnswer || "")
+      setShuffledIndices(saved.shuffledIndices || [])
+      setCurrentIndex(saved.currentIndex || 0)
     } else {
       // Determine initial mode
       let initialMode: "single" | "multiple" | "trueFalse" | "matching" = "single"
@@ -40,13 +55,20 @@ export default function RandomPage() {
       }
       setMode(initialMode)
       
-      const next = getRandomQuestion(subjectId, initialMode)
-      setCurrentQuestion(next)
+      const totalForMode = totals[initialMode === "trueFalse" ? "trueFalse" : initialMode === "matching" ? "matching" : initialMode]
+      const indices = shuffleArray(Array.from({ length: totalForMode }, (_, i) => i))
+      setShuffledIndices(indices)
+      setCurrentIndex(0)
+
+      const qIndex = indices[0]
+      const question = getSequentialQuestion(subjectId, initialMode, qIndex)
+      
+      setCurrentQuestion(question ? { question, index: qIndex } : null)
       setSelectedAnswer("")
       setSubmitted(false)
       setCount(0)
     }
-  }, [subjectId, single, multiple, trueFalse, matching]) 
+  }, [subjectId]) // Only re-run when subject changes
 
   
   // Save progress whenever it changes
@@ -59,10 +81,12 @@ export default function RandomPage() {
       currentQuestion,
       submitted,
       selectedAnswer,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
+      shuffledIndices,
+      currentIndex
     }
     storage.setRandomProgress(subjectId, progress)
-  }, [count, mode, currentQuestion, submitted, selectedAnswer, subjectId, mounted])
+  }, [count, mode, currentQuestion, submitted, selectedAnswer, subjectId, mounted, shuffledIndices, currentIndex])
 
   const handleAnswerSelect = (option: string) => {
     if (submitted) return
@@ -100,8 +124,22 @@ export default function RandomPage() {
   }
 
   const handleNext = () => {
-    const next = getRandomQuestion(subjectId, mode)
-    setCurrentQuestion(next)
+    let nextIndex = currentIndex + 1
+    let nextShuffled = shuffledIndices
+
+    if (nextIndex >= shuffledIndices.length) {
+      // Reshuffle when done
+      const totalForMode = getTotalForMode()
+      nextShuffled = shuffleArray(Array.from({ length: totalForMode }, (_, i) => i))
+      setShuffledIndices(nextShuffled)
+      nextIndex = 0
+    }
+
+    const qIndex = nextShuffled[nextIndex]
+    const question = getSequentialQuestion(subjectId, mode, qIndex)
+
+    setCurrentIndex(nextIndex)
+    setCurrentQuestion(question ? { question, index: qIndex } : null)
     setSelectedAnswer("")
     setSubmitted(false)
     setCount(count + 1)
@@ -109,8 +147,15 @@ export default function RandomPage() {
 
   const handleRestart = () => {
     storage.clearRandomProgress(subjectId)
-    const next = getRandomQuestion(subjectId, mode)
-    setCurrentQuestion(next)
+    const totalForMode = getTotalForMode()
+    const indices = shuffleArray(Array.from({ length: totalForMode }, (_, i) => i))
+    setShuffledIndices(indices)
+    setCurrentIndex(0)
+
+    const qIndex = indices[0]
+    const question = getSequentialQuestion(subjectId, mode, qIndex)
+
+    setCurrentQuestion(question ? { question, index: qIndex } : null)
     setSelectedAnswer("")
     setSubmitted(false)
     setCount(0)
@@ -118,11 +163,19 @@ export default function RandomPage() {
 
   const handleModeChange = (newMode: "single" | "multiple" | "trueFalse" | "matching") => {
     setMode(newMode)
-    const next = getRandomQuestion(subjectId, newMode)
-    setCurrentQuestion(next)
+    
+    const totalForMode = totals[newMode === "trueFalse" ? "trueFalse" : newMode === "matching" ? "matching" : newMode]
+    const indices = shuffleArray(Array.from({ length: totalForMode }, (_, i) => i))
+    setShuffledIndices(indices)
+    setCurrentIndex(0)
+
+    const qIndex = indices[0]
+    const question = getSequentialQuestion(subjectId, newMode, qIndex)
+
+    setCurrentQuestion(question ? { question, index: qIndex } : null)
     setSelectedAnswer("")
     setSubmitted(false)
-    // We keep the count
+    // We keep the count (total questions done in random mode across modes)
   }
 
   if (!mounted) return null

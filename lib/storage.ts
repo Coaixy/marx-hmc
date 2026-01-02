@@ -33,6 +33,8 @@ export interface RandomProgress {
   submitted: boolean
   selectedAnswer?: string
   lastUpdated: number
+  shuffledIndices?: number[]
+  currentIndex?: number
 }
 
 const getStorageKey = (baseKey: string, subjectId: string) => `${baseKey}_${subjectId}`

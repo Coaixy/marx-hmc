@@ -58,6 +58,7 @@ export function AnnouncementDialog({ open, onOpenChange }: AnnouncementDialogPro
                     <Sparkles className="w-4 h-4 text-slate-600" />
                     <p className="font-semibold text-slate-700 dark:text-slate-300">功能优化</p>
                 </div>
+                <p>• 优化<strong>随机刷题</strong>逻辑：采用 Fisher-Yates 算法实现真随机排序，彻底解决题目重复出现的问题</p>
                 <p>• 界面细节优化，体验更流畅</p>
                 <p>• 修复已知问题，提升稳定性</p>
               </div>
