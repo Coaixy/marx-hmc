@@ -418,7 +418,18 @@ export default function ExamPage() {
                     className="flex-1 bg-background border border-border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                     onBlur={(e) => {
                       if (e.target.value && e.target.value !== userInfo.nickname) {
-                        storage.updateUserInfo({ nickname: e.target.value });
+                        const newNickname = e.target.value;
+                        storage.updateUserInfo({ nickname: newNickname });
+                        
+                        // Sync to database
+                        fetch('/api/user/update-nickname', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            deviceId: userInfo.deviceId,
+                            nickname: newNickname,
+                          }),
+                        }).catch(err => console.error('Failed to sync nickname to database:', err))
                       }
                     }}
                   />

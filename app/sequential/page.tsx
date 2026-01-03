@@ -199,7 +199,7 @@ export default function SequentialPage() {
             </Button>
           </Link>
           <div className="text-center">
-            <h1 className="font-semibold text-primary">背题模式 - {subject?.name}</h1>
+            <h1 className="font-semibold text-primary">背题模式</h1>
           </div>
           
           <div className="flex items-center gap-2">

@@ -67,7 +67,7 @@ export default function RankingPage() {
           </Link>
           <h1 className="text-xl font-bold flex items-center gap-2">
             <Trophy className="w-5 h-5 text-yellow-500" />
-            排行榜 - {subject?.name}
+            {subject?.name}
           </h1>
           <div className="w-20"></div> {/* Spacer */}
         </div>
