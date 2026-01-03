@@ -61,7 +61,10 @@ ${options && options.length > 0 ? `选项：\n${options.join('\n')}` : ''}
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [
-            { role: "system", content: "你是一位专业的医学考试辅导助手，请简洁清晰地解析题目。" },
+            { 
+              role: "system", 
+              content: "你是一位专业的医学考试辅导助手，请简洁清晰地解析题目。注意：不要使用 markdown 的加粗（如 **）或列表符号（如 *），直接使用纯文本和数字列表。" 
+            },
             { role: "user", content: prompt }
           ]
         })
