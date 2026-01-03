@@ -33,7 +33,7 @@ export function AiExplanation({ question, options, answer }: AiExplanationProps)
 
   const checkLimit = () => {
     const usage = storage.getAiUsage()
-    if (usage.count >= 30) {
+    if (usage.count >= 3000) {
       toast({
         title: "今日额度已用完",
         description: "AI 解析每天限用 30 次，请明天再来。",
