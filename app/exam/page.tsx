@@ -25,6 +25,7 @@ export default function ExamPage() {
   const [showResult, setShowResult] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [wrongAnswerCount, setWrongAnswerCount] = useState(0)
+  const [startTime, setStartTime] = useState<number>(0)
 
   useEffect(() => {
     setMounted(true)
@@ -59,6 +60,7 @@ export default function ExamPage() {
     setExamStarted(true)
     setAnswers(new Map())
     setWrongAnswerCount(0)
+    setStartTime(Date.now())
 
     // Determine start phase
     if (data.singleQuestions.length > 0) setCurrentPhase("single")
@@ -296,6 +298,8 @@ export default function ExamPage() {
     // Save exam record
     const totalQuestions = totalSingle + totalMultiple + totalTrueFalse + totalMatching
     const accuracy = Math.round((correctCount / totalQuestions) * 100)
+    const durationMs = Date.now() - startTime
+    
     storage.saveExamRecord(subjectId, {
       id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9),
       totalQuestions,
@@ -303,6 +307,20 @@ export default function ExamPage() {
       accuracy,
       timestamp: Date.now(),
     })
+
+    // Upload to database
+    const userInfo = storage.getUserInfo()
+    fetch('/api/exam/record', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        deviceId: userInfo.deviceId,
+        nickname: userInfo.nickname,
+        examType: subjectId,
+        score: accuracy,
+        durationMs,
+      }),
+    }).catch(err => console.error('Failed to upload exam record:', err))
 
     setWrongAnswerCount(incorrectCount)
     setShowResult(true)
@@ -362,6 +380,7 @@ export default function ExamPage() {
     const totalQuestions = totalSingle + totalMultiple + totalTrueFalse + totalMatching
     const totalCorrect = totalQuestions - wrongAnswerCount
     const accuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0
+    const userInfo = storage.getUserInfo()
 
     return (
       <div className="min-h-screen bg-transparent p-4 flex items-center">
@@ -389,19 +408,36 @@ export default function ExamPage() {
                   </CardContent>
                 </Card>
               </div>
+
+              <div className="p-3 bg-secondary/20 rounded-lg space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">你的昵称 (将显示在排行榜):</p>
+                <div className="flex gap-2">
+                  <input 
+                    type="text" 
+                    defaultValue={userInfo.nickname}
+                    className="flex-1 bg-background border border-border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                    onBlur={(e) => {
+                      if (e.target.value && e.target.value !== userInfo.nickname) {
+                        storage.updateUserInfo({ nickname: e.target.value });
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+
               <div className="space-y-2">
-                 {/* 
-                 TODO: Error page also needs to be updated to support subjects, 
-                 but user didn't explicitly ask for it, yet it's linked here.
-                 I'll assume it's fine or I should update it too.
-                 */}
+                <Link href="/ranking" className="block">
+                  <Button variant="default" className="w-full">
+                    查看排行榜
+                  </Button>
+                </Link>
                 <Link href="/errors" className="block">
                   <Button variant="outline" className="w-full bg-transparent">
                     查看错题
                   </Button>
                 </Link>
                 <Link href="/" className="block">
-                  <Button className="w-full">返回首页</Button>
+                  <Button variant="ghost" className="w-full">返回首页</Button>
                 </Link>
               </div>
             </CardContent>

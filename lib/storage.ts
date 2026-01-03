@@ -47,7 +47,13 @@ const STORAGE_KEYS = {
   EXAM_RECORDS: "exam_records",
   AI_CACHE: "ai_cache",
   AI_USAGE: "ai_usage",
-  SETTINGS: "app_settings"
+  SETTINGS: "app_settings",
+  USER_INFO: "user_info"
+}
+
+export interface UserInfo {
+  deviceId: string
+  nickname: string
 }
 
 export interface AppSettings {
@@ -131,6 +137,28 @@ export const storage = {
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(updated))
     // Dispatch custom event to notify other components
     window.dispatchEvent(new Event('settings-updated'))
+  },
+
+  // User Info
+  getUserInfo: (): UserInfo => {
+    if (typeof window === "undefined") return { deviceId: '', nickname: '匿名用户' }
+    const data = localStorage.getItem(STORAGE_KEYS.USER_INFO)
+    if (data) return JSON.parse(data)
+    
+    // Generate new device ID if not exists
+    const newInfo: UserInfo = {
+      deviceId: crypto.randomUUID?.() || Math.random().toString(36).substring(2, 15),
+      nickname: '匿名用户'
+    }
+    localStorage.setItem(STORAGE_KEYS.USER_INFO, JSON.stringify(newInfo))
+    return newInfo
+  },
+
+  updateUserInfo: (info: Partial<UserInfo>) => {
+    if (typeof window === "undefined") return
+    const current = storage.getUserInfo()
+    const updated = { ...current, ...info }
+    localStorage.setItem(STORAGE_KEYS.USER_INFO, JSON.stringify(updated))
   },
 
   // Wrong answers management

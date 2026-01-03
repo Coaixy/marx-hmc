@@ -1,6 +1,6 @@
 "use client"
 
-import { Trophy, Trash2 } from "lucide-react"
+import { Trophy, Trash2, ListOrdered } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useSubject } from "@/components/subject-provider"
@@ -8,6 +8,7 @@ import { storage } from "@/lib/storage"
 import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { motion } from "framer-motion"
+import Link from "next/link"
 
 export function UserProgress() {
   const { subjectId, subject } = useSubject()
@@ -80,19 +81,36 @@ export function UserProgress() {
             </motion.div>
           </div>
           
-          <Button 
-            variant="ghost" 
-            className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 h-auto py-3 justify-start px-3 rounded-xl transition-all group"
-            onClick={() => setShowClearDialog(true)}
-          >
-            <div className="p-2 bg-destructive/10 rounded-lg mr-3 group-hover:bg-destructive/20 transition-colors">
-              <Trash2 className="w-4 h-4" />
-            </div>
-            <div className="text-left flex-1">
-              <span className="block text-sm font-medium">清除错题</span>
-              <span className="block text-xs opacity-70">清空当前科目错题</span>
-            </div>
-          </Button>
+          <div className="space-y-3">
+            <Link href="/ranking" className="block w-full">
+              <Button 
+                variant="ghost" 
+                className="w-full h-auto py-3 justify-start px-3 rounded-xl transition-all group hover:bg-primary/10"
+              >
+                <div className="p-2 bg-primary/10 rounded-lg mr-3 group-hover:bg-primary/20 transition-colors text-primary">
+                  <ListOrdered className="w-4 h-4" />
+                </div>
+                <div className="text-left flex-1">
+                  <span className="block text-sm font-medium">查看排行榜</span>
+                  <span className="block text-xs opacity-70">查看全站最高分</span>
+                </div>
+              </Button>
+            </Link>
+
+            <Button 
+              variant="ghost" 
+              className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 h-auto py-3 justify-start px-3 rounded-xl transition-all group"
+              onClick={() => setShowClearDialog(true)}
+            >
+              <div className="p-2 bg-destructive/10 rounded-lg mr-3 group-hover:bg-destructive/20 transition-colors">
+                <Trash2 className="w-4 h-4" />
+              </div>
+              <div className="text-left flex-1">
+                <span className="block text-sm font-medium">清除错题</span>
+                <span className="block text-xs opacity-70">清空当前科目错题</span>
+              </div>
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
