@@ -45,6 +45,8 @@ const STORAGE_KEYS = {
   RANDOM_PROGRESS: "random_progress",
   EXAM_RESULTS: "exam_results",
   EXAM_RECORDS: "exam_records",
+  AI_CACHE: "ai_cache",
+  AI_USAGE: "ai_usage",
   SETTINGS: "app_settings"
 }
 
@@ -55,6 +57,66 @@ const DEFAULT_SETTINGS: AppSettings = {
 }
 
 export const storage = {
+  // AI Usage Limit
+  getAiUsage: (): { count: number; date: string } => {
+    if (typeof window === "undefined") return { count: 0, date: new Date().toDateString() }
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.AI_USAGE)
+      const today = new Date().toDateString()
+      if (!data) return { count: 0, date: today }
+      
+      const usage = JSON.parse(data)
+      if (usage.date !== today) {
+        return { count: 0, date: today }
+      }
+      return usage
+    } catch (e) {
+      return { count: 0, date: new Date().toDateString() }
+    }
+  },
+
+  incrementAiUsage: () => {
+    if (typeof window === "undefined") return
+    const today = new Date().toDateString()
+    const usage = storage.getAiUsage()
+    
+    const newUsage = {
+      count: usage.date === today ? usage.count + 1 : 1,
+      date: today
+    }
+    localStorage.setItem(STORAGE_KEYS.AI_USAGE, JSON.stringify(newUsage))
+    return newUsage.count
+  },
+
+  // AI Cache
+  getAiCache: (question: string): string | null => {
+    if (typeof window === "undefined") return null
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.AI_CACHE)
+      if (!data) return null
+      const cache = JSON.parse(data)
+      // Simple cache key: hash of the question or just the question string if short enough.
+      // Given question length might vary, we can assume the question string itself is the key for now.
+      // But localStorage has size limits. For a large app, we might need to be careful.
+      // Let's use the question string as key for simplicity in this prototype.
+      return cache[question] || null
+    } catch (e) {
+      return null
+    }
+  },
+
+  setAiCache: (question: string, explanation: string) => {
+    if (typeof window === "undefined") return
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.AI_CACHE)
+      const cache = data ? JSON.parse(data) : {}
+      cache[question] = explanation
+      localStorage.setItem(STORAGE_KEYS.AI_CACHE, JSON.stringify(cache))
+    } catch (e) {
+      // Ignore errors (e.g. quota exceeded)
+    }
+  },
+
   // Settings
   getSettings: (): AppSettings => {
     if (typeof window === "undefined") return DEFAULT_SETTINGS

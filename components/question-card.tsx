@@ -5,6 +5,8 @@ import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion, M
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { highlightNegativeKeywords, NEGATIVE_KEYWORDS, parseMatchingOptions } from "@/lib/utils"
 
+import { AiExplanation } from "@/components/ai-explanation"
+
 interface QuestionCardProps {
   question: SingleChoiceQuestion | MultipleChoiceQuestion | TrueFalseQuestion | MatchingQuestion
   questionNumber: number
@@ -187,25 +189,41 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         </div>
 
         {submitted && (
-          <div
-            className={`p-3 rounded-lg ${
-              showResultFeedback
-                ? isCorrect
-                  ? "bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-100"
-                  : "bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-100"
-                : "bg-blue-50 dark:bg-blue-950/30 text-blue-800 dark:text-blue-100"
-            }`}
-          >
-            {showResultFeedback && <p className="font-medium">{isCorrect ? "正确" : "错误"}</p>}
-            <p className={showResultFeedback ? "text-sm mt-1" : "font-medium"}>
-              正确答案：
-              {type === "trueFalse"
-                ? normalizedCorrectAnswer === "A"
-                  ? "√"
-                  : "×"
+          <>
+            <div
+              className={`p-3 rounded-lg ${
+                showResultFeedback
+                  ? isCorrect
+                    ? "bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-100"
+                    : "bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-100"
+                  : "bg-blue-50 dark:bg-blue-950/30 text-blue-800 dark:text-blue-100"
+              }`}
+            >
+              {showResultFeedback && <p className="font-medium">{isCorrect ? "正确" : "错误"}</p>}
+              <p className={showResultFeedback ? "text-sm mt-1" : "font-medium"}>
+                正确答案：
+                {type === "trueFalse"
+                  ? normalizedCorrectAnswer === "A"
+                    ? "√"
+                    : "×"
+                  : question.答案}
+              </p>
+            </div>
+            <AiExplanation 
+              question={question.题干} 
+              options={options.map(opt => {
+                  const text = type === "trueFalse"
+                    ? opt === "A" ? "正确" : "错误"
+                    : type === "matching"
+                      ? parsedMatchingOptions[opt]
+                      : getOptionText((question as any)[opt], opt);
+                  return `${opt}. ${text}`;
+              })}
+              answer={type === "trueFalse" 
+                ? normalizedCorrectAnswer === "A" ? "正确" : "错误"
                 : question.答案}
-            </p>
-          </div>
+            />
+          </>
         )}
       </CardContent>
     </Card>
