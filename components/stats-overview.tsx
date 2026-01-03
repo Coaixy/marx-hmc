@@ -1,6 +1,5 @@
 "use client"
 
-import { PieChart } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getTotalQuestions } from "@/lib/question-utils"
 import { useSubject } from "@/components/subject-provider"
@@ -30,9 +29,6 @@ export function StatsOverview() {
     <Card className="glass-card border-none">
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
-          <div className="p-2 bg-primary/10 rounded-lg text-primary">
-            <PieChart className="w-5 h-5" />
-          </div>
           <CardTitle className="text-lg">题库概览</CardTitle>
         </div>
       </CardHeader>

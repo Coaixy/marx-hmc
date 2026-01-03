@@ -1,6 +1,5 @@
 "use client"
 
-import { Trophy, Trash2, ListOrdered } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useSubject } from "@/components/subject-provider"
@@ -46,9 +45,6 @@ export function UserProgress() {
       <Card className="glass-card border-none h-full flex flex-col">
         <CardHeader className="pb-2">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg text-amber-600 dark:text-amber-400">
-              <Trophy className="w-5 h-5" />
-            </div>
             <CardTitle className="text-lg">我的战绩</CardTitle>
           </div>
         </CardHeader>
@@ -85,11 +81,8 @@ export function UserProgress() {
             <Link href="/ranking" className="block w-full">
               <Button 
                 variant="ghost" 
-                className="w-full h-auto py-3 justify-start px-3 rounded-xl transition-all group hover:bg-primary/10"
+                className="w-full h-auto py-3 justify-start px-4 rounded-xl transition-all group hover:bg-primary/10"
               >
-                <div className="p-2 bg-primary/10 rounded-lg mr-3 group-hover:bg-primary/20 transition-colors text-primary">
-                  <ListOrdered className="w-4 h-4" />
-                </div>
                 <div className="text-left flex-1">
                   <span className="block text-sm font-medium">查看排行榜</span>
                   <span className="block text-xs opacity-70">查看全站最高分</span>
@@ -99,12 +92,9 @@ export function UserProgress() {
 
             <Button 
               variant="ghost" 
-              className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 h-auto py-3 justify-start px-3 rounded-xl transition-all group"
+              className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 h-auto py-3 justify-start px-4 rounded-xl transition-all group"
               onClick={() => setShowClearDialog(true)}
             >
-              <div className="p-2 bg-destructive/10 rounded-lg mr-3 group-hover:bg-destructive/20 transition-colors">
-                <Trash2 className="w-4 h-4" />
-              </div>
               <div className="text-left flex-1">
                 <span className="block text-sm font-medium">清除错题</span>
                 <span className="block text-xs opacity-70">清空当前科目错题</span>

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useSubject } from "@/components/subject-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, Trophy, Timer, Target, User } from "lucide-react"
+import { ChevronLeft } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { SUBJECTS } from "@/lib/question-data"
@@ -66,7 +66,6 @@ export default function RankingPage() {
             </Button>
           </Link>
           <h1 className="text-xl font-bold flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-yellow-500" />
             {subject?.name}
           </h1>
           <div className="w-20"></div> {/* Spacer */}
@@ -80,8 +79,8 @@ export default function RankingPage() {
                 <span className="w-24">昵称</span>
               </div>
               <div className="flex items-center gap-8">
-                <span className="flex items-center gap-1"><Target className="w-3 h-3" /> 正确率</span>
-                <span className="flex items-center gap-1 w-20 justify-end"><Timer className="w-3 h-3" /> 用时</span>
+                <span className="flex items-center gap-1">正确率</span>
+                <span className="flex items-center gap-1 w-20 justify-end">用时</span>
               </div>
             </div>
           </CardHeader>
