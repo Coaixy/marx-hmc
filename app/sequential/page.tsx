@@ -189,7 +189,7 @@ export default function SequentialPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 p-4 pb-48">
+    <div className="min-h-screen bg-transparent p-4 pb-48">
       <div className="max-w-md mx-auto pt-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
@@ -203,10 +203,10 @@ export default function SequentialPage() {
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-800">
+            <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-border">
                <Label htmlFor="recite-mode" className="text-xs font-medium cursor-pointer flex items-center gap-1.5">
-                  {isReciteMode ? <Eye className="w-3.5 h-3.5 text-blue-500" /> : <EyeOff className="w-3.5 h-3.5 text-slate-500" />}
-                  <span className={isReciteMode ? "text-blue-600 dark:text-blue-400" : "text-slate-600 dark:text-slate-400"}>
+                  {isReciteMode ? <Eye className="w-3.5 h-3.5 text-primary" /> : <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />}
+                  <span className={isReciteMode ? "text-primary" : "text-muted-foreground"}>
                     {isReciteMode ? "背题" : "做题"}
                   </span>
                </Label>
@@ -214,7 +214,7 @@ export default function SequentialPage() {
                   id="recite-mode"
                   checked={isReciteMode}
                   onCheckedChange={setIsReciteMode}
-                  className="scale-75 data-[state=checked]:bg-blue-500"
+                  className="scale-75 data-[state=checked]:bg-primary"
                />
             </div>
             <AnswerSheet
@@ -285,7 +285,7 @@ export default function SequentialPage() {
         </div>
 
         {/* Controls */}
-        <div className="space-y-3 fixed bottom-24 left-0 right-0 p-4 bg-gradient-to-t from-blue-50 to-transparent dark:from-slate-950 dark:to-transparent max-w-md mx-auto pointer-events-none z-40">
+        <div className="space-y-3 fixed bottom-24 left-0 right-0 p-4 bg-gradient-to-t from-background to-transparent max-w-md mx-auto pointer-events-none z-40">
           <div className="flex gap-2 pointer-events-auto">
             <Button
               onClick={handlePrev}
@@ -300,7 +300,7 @@ export default function SequentialPage() {
                 <Button 
                     onClick={handleSubmit} 
                     disabled={!selectedAnswer} 
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30"
+                    className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30"
                 >
                     <CheckCircle className="w-4 h-4 mr-2" /> 提交
                 </Button>

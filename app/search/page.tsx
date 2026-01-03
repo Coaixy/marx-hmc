@@ -45,7 +45,7 @@ export default function SearchPage() {
   }, [allQuestions, searchTerm])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 p-4 pb-24">
+    <div className="min-h-screen bg-transparent p-4 pb-24">
       <div className="max-w-md mx-auto pt-4 space-y-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
@@ -67,7 +67,7 @@ export default function SearchPage() {
             placeholder="输入关键词（支持空格分隔多个关键词）..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 bg-white/80 dark:bg-slate-900/80 backdrop-blur"
+            className="pl-9 bg-background/80 backdrop-blur"
           />
         </div>
 

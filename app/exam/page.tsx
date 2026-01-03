@@ -324,7 +324,7 @@ export default function ExamPage() {
 
   if (!examStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 p-4 flex items-center">
+      <div className="min-h-screen bg-transparent p-4 flex items-center">
         <div className="max-w-md mx-auto w-full">
           <Link href="/" className="mb-4 block">
             <Button variant="outline">
@@ -364,7 +364,7 @@ export default function ExamPage() {
     const accuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 p-4 flex items-center">
+      <div className="min-h-screen bg-transparent p-4 flex items-center">
         <div className="max-w-md mx-auto w-full">
           <Card>
             <CardHeader>
@@ -430,7 +430,7 @@ export default function ExamPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-950 dark:to-slate-900 p-4 pb-48">
+    <div className="min-h-screen bg-transparent p-4 pb-48">
       <div className="max-w-md mx-auto pt-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
@@ -494,7 +494,7 @@ export default function ExamPage() {
         </div>
 
         {/* Controls */}
-        <div className="fixed bottom-24 left-0 right-0 p-4 bg-gradient-to-t from-blue-50 to-transparent dark:from-slate-950 dark:to-transparent max-w-md mx-auto pointer-events-none z-40">
+        <div className="fixed bottom-24 left-0 right-0 p-4 bg-gradient-to-t from-background to-transparent max-w-md mx-auto pointer-events-none z-40">
           {!submitted ? (
             <Button onClick={handleSubmit} disabled={!selectedAnswer} className="w-full pointer-events-auto" size="lg">
               提交答案

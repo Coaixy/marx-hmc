@@ -42,7 +42,7 @@ export function UserProgress() {
 
   return (
     <>
-      <Card className="glass-card border-none bg-white/60 dark:bg-slate-900/60 h-full flex flex-col">
+      <Card className="glass-card border-none h-full flex flex-col">
         <CardHeader className="pb-2">
           <div className="flex items-center gap-2">
             <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg text-amber-600 dark:text-amber-400">

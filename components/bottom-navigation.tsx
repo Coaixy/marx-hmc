@@ -47,7 +47,7 @@ export function BottomNavigation() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t border-black/[0.03] dark:border-white/[0.05] shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.05)]">
+    <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe bg-background/80 backdrop-blur-xl border-t border-border shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.05)]">
       <nav className="relative flex items-center justify-around px-2 py-3">
         {navigationItems.map((item) => {
           const Icon = item.icon
@@ -59,7 +59,7 @@ export function BottomNavigation() {
               href={item.href}
               className={cn(
                 "relative flex flex-col items-center justify-center min-w-[60px] px-1 py-1 rounded-xl transition-colors duration-300 group",
-                isActive ? "text-primary" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
               )}
             >
               {isActive && (

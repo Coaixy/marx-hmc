@@ -27,7 +27,7 @@ export function StatsOverview() {
   }
 
   return (
-    <Card className="glass-card border-none bg-white/60 dark:bg-slate-900/60">
+    <Card className="glass-card border-none">
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
           <div className="p-2 bg-primary/10 rounded-lg text-primary">
