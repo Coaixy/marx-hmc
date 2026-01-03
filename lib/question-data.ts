@@ -85,11 +85,11 @@ export const SUBJECTS = {
     name: '马克思主义基本原理',
     data: questionsData as QuestionBank
   },
-  // bio: {
-  //   id: 'bio',
-  //   name: '生物化学',
-  //   data: bioData as unknown as QuestionBank
-  // },
+  bio: {
+    id: 'bio',
+    name: '生物化学',
+    data: bioData as unknown as QuestionBank
+  },
   cell: {
     id: 'cell',
     name: '细胞生物学',
@@ -105,11 +105,11 @@ export const SUBJECTS = {
     name: '临床基础检验',
     data: clinicalData as unknown as QuestionBank
   },
-  // law: {
-  //   id: 'law',
-  //   name: '医事法学',
-  //   data: lawData as unknown as QuestionBank
-  // }
+  law: {
+    id: 'law',
+    name: '医事法学',
+    data: lawData as unknown as QuestionBank
+  }
 } as const
 
 export type SubjectId = keyof typeof SUBJECTS

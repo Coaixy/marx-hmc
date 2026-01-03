@@ -107,26 +107,26 @@ export function HomeHeader({ onAnnouncementClick }: HomeHeaderProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 no-scrollbar"
+        className="flex items-center gap-3 w-full md:w-auto"
       >
-        <div className="flex p-1.5 bg-secondary/50 rounded-2xl border border-border backdrop-blur-sm min-w-max">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap p-1.5 bg-secondary/50 rounded-2xl border border-border backdrop-blur-sm w-full md:w-auto gap-1">
           {Object.values(SUBJECTS).map((sub) => (
             <button
               key={sub.id}
               onClick={() => setSubjectId(sub.id as SubjectId)}
               className={cn(
-                "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 relative z-10",
+                "px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center justify-center sm:justify-start gap-2 relative z-10",
                 subjectId === sub.id
-                  ? "bg-background text-primary shadow-sm scale-105 font-bold ring-1 ring-border/50"
-                  : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                  ? "bg-background text-primary shadow-sm scale-[1.02] font-bold ring-1 ring-border/50"
+                  : "text-muted-foreground hover:text-foreground hover:bg-background/30"
               )}
             >
               {sub.id === 'marx' ? (
-                <GraduationCap className="w-4 h-4" />
+                <GraduationCap className="w-4 h-4 shrink-0" />
               ) : (
-                <BrainCircuit className="w-4 h-4" />
+                <BrainCircuit className="w-4 h-4 shrink-0" />
               )}
-              {sub.name}
+              <span className="truncate">{sub.name}</span>
             </button>
           ))}
         </div>

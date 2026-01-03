@@ -5,7 +5,6 @@ import { SUBJECTS, type SubjectId } from "@/lib/question-data"
 import { getTotalQuestions } from "@/lib/question-utils"
 import { storage } from "@/lib/storage"
 import { AnnouncementDialog } from "@/components/announcement-dialog"
-import { CountdownTimer } from "@/components/countdown-timer"
 import { HomeHeader } from "@/components/home-header"
 import { StatsOverview } from "@/components/stats-overview"
 import { UserProgress } from "@/components/user-progress"
@@ -43,14 +42,6 @@ export default function Home() {
 
       <div className="max-w-6xl mx-auto space-y-8 relative z-10">
         <HomeHeader onAnnouncementClick={() => setShowAnnouncement(true)} />
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <CountdownTimer />
-        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <motion.div 
