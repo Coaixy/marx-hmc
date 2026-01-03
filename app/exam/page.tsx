@@ -10,13 +10,14 @@ import { storage } from "@/lib/storage"
 import { ChevronLeft, Home } from "lucide-react"
 import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion, MatchingQuestion } from "@/lib/question-data"
 import type { AnswerRecord } from "@/lib/storage"
+import type { ExamQuestionWithIndex } from "@/lib/question-utils"
 import { AnswerSheet } from "@/components/answer-sheet"
 import { useSubject } from "@/components/subject-provider"
 
 export default function ExamPage() {
   const { subjectId, subject } = useSubject()
   const [examStarted, setExamStarted] = useState(false)
-  const [examData, setExamData] = useState<{ singleQuestions: SingleChoiceQuestion[]; multipleQuestions: MultipleChoiceQuestion[]; trueFalseQuestions: TrueFalseQuestion[]; matchingQuestions: MatchingQuestion[] } | null>(null)
+  const [examData, setExamData] = useState<{ singleQuestions: ExamQuestionWithIndex[]; multipleQuestions: ExamQuestionWithIndex[]; trueFalseQuestions: ExamQuestionWithIndex[]; matchingQuestions: ExamQuestionWithIndex[] } | null>(null)
   const [currentPhase, setCurrentPhase] = useState<"single" | "multiple" | "trueFalse" | "matching">("single")
   const [questionIndex, setQuestionIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string>()
@@ -73,12 +74,12 @@ export default function ExamPage() {
 
   const currentQuestion = examData
     ? currentPhase === "single"
-      ? examData.singleQuestions[questionIndex]
+      ? examData.singleQuestions[questionIndex]?.question
       : currentPhase === "multiple"
-        ? examData.multipleQuestions[questionIndex]
+        ? examData.multipleQuestions[questionIndex]?.question
         : currentPhase === "trueFalse"
-          ? examData.trueFalseQuestions[questionIndex]
-          : examData.matchingQuestions[questionIndex]
+          ? examData.trueFalseQuestions[questionIndex]?.question
+          : examData.matchingQuestions[questionIndex]?.question
     : null
 
   const totalSingle = examData?.singleQuestions.length || 0
@@ -209,7 +210,7 @@ export default function ExamPage() {
     let correctCount = 0
 
     // Single choice answers
-    examData.singleQuestions.forEach((q, idx) => {
+    examData.singleQuestions.forEach(({ question: q, originalIndex }, idx) => {
       const key = `single-${idx}`
       const userAnswer = answers.get(key) || ""
       const isCorrect = userAnswer === q.答案
@@ -217,7 +218,7 @@ export default function ExamPage() {
         incorrectCount++
         results.push({
           id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9),
-          questionIndex: idx,
+          questionIndex: originalIndex,
           type: "single" as const,
           userAnswer,
           correctAnswer: q.答案,
@@ -230,7 +231,7 @@ export default function ExamPage() {
     })
 
     // Multiple choice answers
-    examData.multipleQuestions.forEach((q, idx) => {
+    examData.multipleQuestions.forEach(({ question: q, originalIndex }, idx) => {
       const key = `multiple-${idx}`
       const userAnswer = answers.get(key) || ""
       const isCorrect = userAnswer === q.答案
@@ -238,7 +239,7 @@ export default function ExamPage() {
         incorrectCount++
         results.push({
           id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9),
-          questionIndex: idx,
+          questionIndex: originalIndex,
           type: "multiple" as const,
           userAnswer,
           correctAnswer: q.答案,
@@ -251,7 +252,7 @@ export default function ExamPage() {
     })
 
     // True/False answers
-    examData.trueFalseQuestions.forEach((q, idx) => {
+    examData.trueFalseQuestions.forEach(({ question: q, originalIndex }, idx) => {
       const key = `trueFalse-${idx}`
       const userAnswer = answers.get(key) || ""
       const isCorrect = userAnswer === q.答案
@@ -259,7 +260,7 @@ export default function ExamPage() {
         incorrectCount++
         results.push({
           id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9),
-          questionIndex: idx,
+          questionIndex: originalIndex,
           type: "trueFalse" as const,
           userAnswer,
           correctAnswer: q.答案,
@@ -272,7 +273,7 @@ export default function ExamPage() {
     })
 
     // Matching answers
-    examData.matchingQuestions.forEach((q, idx) => {
+    examData.matchingQuestions.forEach(({ question: q, originalIndex }, idx) => {
       const key = `matching-${idx}`
       const userAnswer = answers.get(key) || ""
       const isCorrect = userAnswer === q.答案
@@ -280,7 +281,7 @@ export default function ExamPage() {
         incorrectCount++
         results.push({
           id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9),
-          questionIndex: idx,
+          questionIndex: originalIndex,
           type: "matching" as const,
           userAnswer,
           correctAnswer: q.答案,

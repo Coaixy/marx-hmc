@@ -1,6 +1,6 @@
 export interface AnswerRecord {
   id: string
-  questionIndex: number
+  questionIndex: number // Index in the original question bank
   type: "single" | "multiple" | "trueFalse" | "matching"
   userAnswer: string
   correctAnswer: string

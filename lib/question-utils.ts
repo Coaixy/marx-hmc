@@ -66,29 +66,39 @@ export const getRandomQuestion = (subjectId: string, type: "single" | "multiple"
   return { question: questions[index], index }
 }
 
+export interface ExamQuestionWithIndex {
+  question: any
+  originalIndex: number // Original index in the question bank
+}
+
 export const getExamQuestions = (subjectId: string) => {
   const bank = getQuestionBank(subjectId)
 
-  const singleQuestions = (bank.单选题 || []).sort(() => Math.random() - 0.5).slice(0, 25)
-  const multipleQuestions = (bank.多选题 || []).sort(() => Math.random() - 0.5).slice(0, 5)
-  const trueFalseQuestions = (bank.判断题 || [])
-    .map((q) => ({
-      ...q,
-      答案: q.答案 === "√" ? "A" : "B",
+  // Helper function to get random questions with original indices
+  const getRandomQuestionsWithIndices = (questions: any[], count: number) => {
+    const indexed = questions.map((q, idx) => ({ question: q, originalIndex: idx }))
+    return indexed.sort(() => Math.random() - 0.5).slice(0, count)
+  }
+
+  const singleQuestions = getRandomQuestionsWithIndices(bank.单选题 || [], 25)
+  const multipleQuestions = getRandomQuestionsWithIndices(bank.多选题 || [], 5)
+  const trueFalseQuestions = getRandomQuestionsWithIndices(bank.判断题 || [], 10).map(({ question, originalIndex }) => ({
+    question: {
+      ...question,
+      答案: question.答案 === "√" ? "A" : "B",
       A: "√",
       B: "×",
       C: "",
       D: "",
       章节: "",
       难度: ""
-    }))
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 10)
+    },
+    originalIndex
+  }))
 
   // Include matching questions if available (up to 5 questions)
-  const matchingQuestions = (bank.匹配题 || [])
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 5)
+  const availableMatching = bank.匹配题 || []
+  const matchingQuestions = availableMatching.length > 0 ? getRandomQuestionsWithIndices(availableMatching, Math.min(5, availableMatching.length)) : []
 
   return { singleQuestions, multipleQuestions, trueFalseQuestions, matchingQuestions }
 }

@@ -18,7 +18,18 @@ export default function ErrorsPage() {
   
   // Reload when subject changes
   useEffect(() => {
-    setWrongAnswers(storage.getWrongAnswers(subjectId))
+    const answers = storage.getWrongAnswers(subjectId)
+    // Filter out invalid answers (those without valid questions)
+    const validAnswers = answers.filter(answer => {
+      const qContent = getQuestionContent(answer.type, answer.questionIndex)
+      return qContent !== null
+    })
+    // If some answers were invalid, update storage
+    if (validAnswers.length !== answers.length) {
+      storage.clearWrongAnswers(subjectId)
+      validAnswers.forEach(answer => storage.addWrongAnswer(subjectId, answer))
+    }
+    setWrongAnswers(validAnswers)
     setSelectedId(undefined)
   }, [subjectId])
 
@@ -28,17 +39,35 @@ export default function ErrorsPage() {
   const bank = getQuestionBank(subjectId)
   
   const getQuestionContent = (type: string, index: number) => {
-    if (type === "single") return (bank.单选题 || [])[index]
-    if (type === "multiple") return (bank.多选题 || [])[index]
+    // Add bounds checking to prevent index out of range errors
+    if (index < 0) return null
+
+    if (type === "single") {
+      const questions = bank.单选题 || []
+      return index < questions.length ? questions[index] : null
+    }
+    if (type === "multiple") {
+      const questions = bank.多选题 || []
+      return index < questions.length ? questions[index] : null
+    }
     if (type === "trueFalse") {
-        const q = (bank.判断题 || [])[index]
-        if (!q) return null
+        const questions = bank.判断题 || []
+        const q = questions[index]
+        if (!q || index >= questions.length) return null
         return {
             ...q,
             答案: q.答案 === "√" ? "A" : "B",
             A: "√",
-            B: "×"
+            B: "×",
+            C: "",
+            D: "",
+            章节: "",
+            难度: ""
         }
+    }
+    if (type === "matching") {
+      const questions = bank.匹配题 || []
+      return index < questions.length ? questions[index] : null
     }
     return null
   }
@@ -176,7 +205,7 @@ export default function ErrorsPage() {
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <p className="font-semibold text-sm">
-                          {answer.type === "single" ? "单选题" : answer.type === "multiple" ? "多选题" : "判断题"} {idx + 1}
+                          {answer.type === "single" ? "单选题" : answer.type === "multiple" ? "多选题" : answer.type === "trueFalse" ? "判断题" : answer.type === "matching" ? "匹配题" : "未知题型"} {idx + 1}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                           {qContent?.题干 || "题目加载失败或已更新"}
@@ -208,3 +237,4 @@ export default function ErrorsPage() {
     </div>
   )
 }
+
