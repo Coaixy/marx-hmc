@@ -67,3 +67,29 @@ export async function POST(req: Request) {
   }
 }
 
+// Delete a comment
+export async function DELETE(req: Request) {
+  try {
+    const { id, deviceId } = await req.json();
+
+    if (!id || !deviceId) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Only allow user to delete their own comment (soft delete)
+    const [result]: any = await pool.execute(
+      'UPDATE question_comments SET status = 0 WHERE id = ? AND device_id = ?',
+      [id, deviceId]
+    );
+
+    if (result.affectedRows === 0) {
+      return NextResponse.json({ error: 'Comment not found or unauthorized' }, { status: 403 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Delete Comment Error:', error);
+    return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 });
+  }
+}
+

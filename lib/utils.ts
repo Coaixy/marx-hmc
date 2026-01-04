@@ -57,10 +57,31 @@ const hashCache = new Map<string, string>();
 export async function generateQuestionHash(text: string): Promise<string> {
   if (hashCache.has(text)) return hashCache.get(text)!;
 
-  const msgUint8 = new TextEncoder().encode(text);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  let hash = '';
+  try {
+    // 优先使用 Web Crypto API (需要 HTTPS)
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+      const msgUint8 = new TextEncoder().encode(text);
+      const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } else {
+      // 降级方案：简单的哈希算法 (确保在非 HTTPS 环境下也能运行)
+      let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+      for (let i = 0, ch; i < text.length; i++) {
+        ch = text.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+      }
+      h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+      h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+      hash = (h1 >>> 0).toString(16).padStart(8, '0') + (h2 >>> 0).toString(16).padStart(8, '0');
+    }
+  } catch (e) {
+    console.error("Hash generation error:", e);
+    // 最后的保底方案
+    hash = text.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0).toString(16);
+  }
   
   hashCache.set(text, hash);
   return hash;

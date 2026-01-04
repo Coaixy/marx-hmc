@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { storage } from "@/lib/storage"
 import { generateQuestionHash, cn } from "@/lib/utils"
-import { MessageSquare, Send, User, Reply as ReplyIcon, X, ChevronDown, ChevronUp } from "lucide-react"
+import { MessageSquare, Send, User, Reply as ReplyIcon, X, ChevronDown, ChevronUp, Trash2 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { zhCN } from "date-fns/locale"
 import { toast } from "sonner"
@@ -103,6 +103,32 @@ export const QuestionComments: React.FC<QuestionCommentsProps> = ({ questionText
     }
   }
 
+  const handleDelete = async (commentId: number) => {
+    if (!confirm("确定要删除这条留言吗？")) return
+
+    const userInfo = storage.getUserInfo()
+    try {
+      const res = await fetch("/api/comments", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: commentId,
+          deviceId: userInfo.deviceId,
+        }),
+      })
+
+      if (res.ok) {
+        toast.success("删除成功")
+        loadComments()
+      } else {
+        toast.error("删除失败")
+      }
+    } catch (error) {
+      console.error("Failed to delete comment:", error)
+      toast.error("网络错误")
+    }
+  }
+
   const threads = useMemo(() => {
     const rootComments = comments.filter(c => c.parent_id === 0)
     const replies = comments.filter(c => c.parent_id !== 0)
@@ -112,6 +138,11 @@ export const QuestionComments: React.FC<QuestionCommentsProps> = ({ questionText
       replies: replies.filter(r => r.parent_id === root.id)
     }))
   }, [comments])
+
+  const currentUserDeviceId = useMemo(() => {
+    if (typeof window === 'undefined') return ''
+    return storage.getUserInfo().deviceId
+  }, [])
 
   if (!isExpanded) {
     return (
@@ -214,6 +245,15 @@ export const QuestionComments: React.FC<QuestionCommentsProps> = ({ questionText
                       <ReplyIcon className="w-3 h-3" />
                       回复
                     </button>
+                    {currentUserDeviceId === thread.device_id && (
+                      <button 
+                        onClick={() => handleDelete(thread.id)}
+                        className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        删除
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -221,13 +261,23 @@ export const QuestionComments: React.FC<QuestionCommentsProps> = ({ questionText
               {thread.replies.length > 0 && (
                 <div className="ml-11 space-y-3 border-l-2 border-secondary pl-4">
                   {thread.replies.map((reply) => (
-                    <div key={reply.id} className="flex gap-2 py-2">
+                    <div key={reply.id} className="flex gap-2 py-2 group">
                       <div className="w-6 h-6 rounded-full bg-secondary/50 flex items-center justify-center flex-shrink-0">
                         <User className="w-3 h-3 text-muted-foreground" />
                       </div>
                       <div className="flex-1 space-y-0.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-semibold text-primary/80">{reply.nickname || "匿名用户"}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-primary/80">{reply.nickname || "匿名用户"}</span>
+                            {currentUserDeviceId === reply.device_id && (
+                              <button 
+                                onClick={() => handleDelete(reply.id)}
+                                className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-red-500 transition-opacity"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
                           <span className="text-[9px] text-muted-foreground">
                             {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true, locale: zhCN })}
                           </span>
