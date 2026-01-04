@@ -51,3 +51,17 @@ export const parseMatchingOptions = (optionsStr: string): Record<string, string>
   
   return options
 }
+
+const hashCache = new Map<string, string>();
+
+export async function generateQuestionHash(text: string): Promise<string> {
+  if (hashCache.has(text)) return hashCache.get(text)!;
+
+  const msgUint8 = new TextEncoder().encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  
+  hashCache.set(text, hash);
+  return hash;
+}

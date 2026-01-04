@@ -8,12 +8,18 @@ export async function GET(req: Request) {
     const limit = parseInt(searchParams.get('limit') || '50');
 
     // Get top scores, grouped by device_id to show only the best score per user
-    // Take the highest score for each user (device_id) with the shortest duration for that score
+    // Join with device_user_config to get the latest nickname
     const query = `
-      SELECT nickname, MAX(score) as score, MIN(duration_ms) as duration_ms, MAX(created_at) as created_at, device_id
-      FROM exam_records
-      WHERE exam_type = ?
-      GROUP BY device_id, nickname
+      SELECT 
+        COALESCE(u.nickname, '匿名用户') as nickname, 
+        MAX(r.score) as score, 
+        MIN(r.duration_ms) as duration_ms, 
+        MAX(r.created_at) as created_at, 
+        r.device_id
+      FROM exam_records r
+      LEFT JOIN device_user_config u ON r.device_id = u.device_id
+      WHERE r.exam_type = ?
+      GROUP BY r.device_id
       ORDER BY score DESC, duration_ms ASC
       LIMIT ?
     `;

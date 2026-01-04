@@ -9,10 +9,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Update nickname in all past exam records for this device
+    // Update or insert nickname in device_user_config
     await pool.execute(
-      'UPDATE exam_records SET nickname = ? WHERE device_id = ?',
-      [nickname, deviceId]
+      'INSERT INTO device_user_config (device_id, nickname) VALUES (?, ?) ON DUPLICATE KEY UPDATE nickname = ?',
+      [deviceId, nickname, nickname]
     );
 
     return NextResponse.json({ success: true });

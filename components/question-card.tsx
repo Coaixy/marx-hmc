@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { highlightNegativeKeywords, NEGATIVE_KEYWORDS, parseMatchingOptions } from "@/lib/utils"
 
 import { AiExplanation } from "@/components/ai-explanation"
+import { QuestionComments } from "@/components/question-comments"
 
 interface QuestionCardProps {
   question: SingleChoiceQuestion | MultipleChoiceQuestion | TrueFalseQuestion | MatchingQuestion
@@ -225,6 +226,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             />
           </>
         )}
+
+        <QuestionComments questionText={question.题干} />
       </CardContent>
     </Card>
   )
