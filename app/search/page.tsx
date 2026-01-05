@@ -88,6 +88,7 @@ export default function SearchPage() {
                 onAnswerSelect={() => {}}
                 selectedAnswer={q.答案}
                 submitted={true}
+                showComments={false}
               />
             ))
           )}

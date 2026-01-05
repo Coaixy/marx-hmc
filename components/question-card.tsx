@@ -16,6 +16,7 @@ interface QuestionCardProps {
   onAnswerSelect: (answer: string) => void
   selectedAnswer?: string
   submitted?: boolean
+  showComments?: boolean
 }
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -26,6 +27,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   onAnswerSelect,
   selectedAnswer,
   submitted = false,
+  showComments = true,
 }) => {
   const parsedMatchingOptions = useMemo(() => {
     if (type === "matching") {
@@ -227,11 +229,13 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           </>
         )}
 
-        <QuestionComments
-          questionText={question.题干}
-          questionData={question}
-          questionType={type}
-        />
+        {showComments && (
+          <QuestionComments
+            questionText={question.题干}
+            questionData={question}
+            questionType={type}
+          />
+        )}
       </CardContent>
     </Card>
   )
