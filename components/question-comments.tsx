@@ -24,12 +24,12 @@ interface QuestionCommentsProps {
   autoLoad?: boolean
 }
 
-export const QuestionComments: React.FC<QuestionCommentsProps> = ({ questionText, autoLoad = false }) => {
+export const QuestionComments: React.FC<QuestionCommentsProps> = ({ questionText, autoLoad = true }) => {
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState("")
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(autoLoad)
+  const [isExpanded, setIsExpanded] = useState(true)
   const [questionHash, setQuestionHash] = useState<string | null>(null)
   const [replyTo, setReplyTo] = useState<Comment | null>(null)
 
@@ -63,6 +63,9 @@ export const QuestionComments: React.FC<QuestionCommentsProps> = ({ questionText
   useEffect(() => {
     if (!autoLoad) {
       setIsExpanded(false)
+      setComments([])
+    } else {
+      // When autoLoad is true, keep expanded but reload comments for new question
       setComments([])
     }
   }, [questionText, autoLoad])
@@ -222,7 +225,7 @@ export const QuestionComments: React.FC<QuestionCommentsProps> = ({ questionText
           threads.map((thread) => (
             <div key={thread.id} className="space-y-4">
               <div className="flex gap-3 p-3 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                   <User className="w-4 h-4 text-primary" />
                 </div>
                 <div className="flex-1 space-y-1">
@@ -262,7 +265,7 @@ export const QuestionComments: React.FC<QuestionCommentsProps> = ({ questionText
                 <div className="ml-11 space-y-3 border-l-2 border-secondary pl-4">
                   {thread.replies.map((reply) => (
                     <div key={reply.id} className="flex gap-2 py-2 group">
-                      <div className="w-6 h-6 rounded-full bg-secondary/50 flex items-center justify-center flex-shrink-0">
+                      <div className="w-6 h-6 rounded-full bg-secondary/50 flex items-center justify-center shrink-0">
                         <User className="w-3 h-3 text-muted-foreground" />
                       </div>
                       <div className="flex-1 space-y-0.5">
