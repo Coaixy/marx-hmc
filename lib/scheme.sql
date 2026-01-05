@@ -29,6 +29,7 @@ CREATE TABLE `question_comments` (
   `device_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户设备唯一标识',
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '留言内容',
   `parent_id` bigint DEFAULT '0' COMMENT '父评论ID (0代表是一级留言，非0代表是回复)',
+  `is_ai` tinyint(1) DEFAULT '0' COMMENT '是否为AI回复: 0用户, 1AI',
   `like_count` int DEFAULT '0' COMMENT '点赞数',
   `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '来源IP (用于简单的安全风控)',
   `status` tinyint(1) DEFAULT '1' COMMENT '状态: 1正常, 0隐藏/删除 (软删除)',

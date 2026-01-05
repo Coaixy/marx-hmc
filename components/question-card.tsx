@@ -210,7 +210,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                   : question.答案}
               </p>
             </div>
-            <AiExplanation 
+            {/* <AiExplanation 
               question={question.题干} 
               options={options.map(opt => {
                   const text = type === "trueFalse"
@@ -223,11 +223,15 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               answer={type === "trueFalse" 
                 ? normalizedCorrectAnswer === "A" ? "正确" : "错误"
                 : question.答案}
-            />
+            /> */}
           </>
         )}
 
-        <QuestionComments questionText={question.题干} />
+        <QuestionComments
+          questionText={question.题干}
+          questionData={question}
+          questionType={type}
+        />
       </CardContent>
     </Card>
   )

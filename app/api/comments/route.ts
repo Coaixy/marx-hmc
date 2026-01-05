@@ -8,16 +8,19 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const questionHash = searchParams.get('questionHash');
 
+    console.log('API GET comments for hash:', questionHash)
+
     if (!questionHash) {
       return NextResponse.json({ error: 'Missing questionHash' }, { status: 400 });
     }
 
     const query = `
-      SELECT 
-        c.id, 
-        c.content, 
-        c.created_at, 
+      SELECT
+        c.id,
+        c.content,
+        c.created_at,
         c.parent_id,
+        c.is_ai,
         u.nickname,
         c.device_id
       FROM question_comments c
@@ -27,6 +30,8 @@ export async function GET(req: Request) {
     `;
 
     const [rows]: any = await pool.execute(query, [questionHash]);
+
+    console.log('Database query result:', rows.length, 'comments found')
 
     return NextResponse.json(rows);
   } catch (error) {
@@ -38,7 +43,7 @@ export async function GET(req: Request) {
 // Post a new comment
 export async function POST(req: Request) {
   try {
-    const { questionHash, deviceId, nickname, content, parentId } = await req.json();
+    const { questionHash, deviceId, nickname, content, parentId, isAi = false } = await req.json();
 
     if (!questionHash || !deviceId || !content) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -54,13 +59,15 @@ export async function POST(req: Request) {
 
     // 2. Insert comment
     const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
-    
-    await pool.execute(
-      'INSERT INTO question_comments (question_hash, device_id, content, ip_address, parent_id) VALUES (?, ?, ?, ?, ?)',
-      [questionHash, deviceId, content, ip, parentId || 0]
+
+    const [result]: any = await pool.execute(
+      'INSERT INTO question_comments (question_hash, device_id, content, ip_address, parent_id, is_ai) VALUES (?, ?, ?, ?, ?, ?)',
+      [questionHash, deviceId, content, ip, parentId || 0, isAi ? 1 : 0]
     );
 
-    return NextResponse.json({ success: true });
+    const commentId = result.insertId;
+
+    return NextResponse.json({ success: true, commentId });
   } catch (error) {
     console.error('Post Comment Error:', error);
     return NextResponse.json({ error: 'Failed to post comment' }, { status: 500 });
