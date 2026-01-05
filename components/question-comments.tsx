@@ -34,14 +34,14 @@ export const QuestionComments: React.FC<QuestionCommentsProps> = ({ questionText
   const [replyTo, setReplyTo] = useState<Comment | null>(null)
 
   // Fetch comments only when expanded
-  const loadComments = useCallback(async () => {
-    if (fetching) return
-    
+  const loadComments = useCallback(async (forceRefresh = false) => {
+    if (fetching && !forceRefresh) return
+
     setFetching(true)
     try {
       const hash = await generateQuestionHash(questionText)
       setQuestionHash(hash)
-      const res = await fetch(`/api/comments?questionHash=${hash}`)
+      const res = await fetch(`/api/comments?questionHash=${hash}&t=${Date.now()}`)
       const data = await res.json()
       if (Array.isArray(data)) {
         setComments(data)
@@ -94,7 +94,7 @@ export const QuestionComments: React.FC<QuestionCommentsProps> = ({ questionText
         setNewComment("")
         setReplyTo(null)
         toast.success(parentId > 0 ? "回复成功" : "留言成功")
-        loadComments()
+        loadComments(true) // Force refresh comments
       } else {
         toast.error("操作失败")
       }
@@ -122,7 +122,7 @@ export const QuestionComments: React.FC<QuestionCommentsProps> = ({ questionText
 
       if (res.ok) {
         toast.success("删除成功")
-        loadComments()
+        loadComments(true) // Force refresh comments
       } else {
         toast.error("删除失败")
       }
