@@ -151,7 +151,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             {getQuestionTypeLabel()} {questionNumber}
             /{totalQuestions}
           </CardTitle>
-          {type !== "trueFalse" && type !== "matching" && (
+          {type !== "trueFalse" && type !== "matching" && (question as SingleChoiceQuestion | MultipleChoiceQuestion).难度 && (
             <span className="text-sm px-3 py-1 bg-secondary rounded-full">
               {(question as SingleChoiceQuestion | MultipleChoiceQuestion).难度}
             </span>

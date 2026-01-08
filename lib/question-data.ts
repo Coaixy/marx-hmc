@@ -51,6 +51,7 @@ import clinicalData from './clinical.json'
 import lawData from './law.json'
 import cellData from './cell.json'
 import informationData from './information.json'
+import englishData from './english.json'
 
 // 处理 med_bio 数据，将其转换为标准格式
 const processMedBioData = (data: any[]): QuestionBank => {
@@ -115,6 +116,11 @@ export const SUBJECTS = {
     id: 'information',
     name: '医学信息检索',
     data: informationData as unknown as QuestionBank
+  },
+  english: {
+    id: 'english',
+    name: '大学英语',
+    data: englishData as unknown as QuestionBank
   }
 } as const
 
