@@ -70,15 +70,14 @@ export function HomeHeader({ onAnnouncementClick }: HomeHeaderProps) {
           </div>
 
           <div className="flex items-center gap-2 mt-1.5">
-            NickName ：
             {isEditing ? (
-              <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm border border-primary/30 rounded-full px-3 py-1 shadow-sm">
-
+              <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm border border-primary/30 rounded-full px-4 py-1.5 shadow-sm ring-2 ring-primary/10 transition-all">
                 <input
                   type="text"
                   value={tempNickname}
                   onChange={(e) => setTempNickname(e.target.value)}
-                  className="bg-transparent border-none text-xs font-medium focus:outline-none w-28 text-foreground"
+                  className="bg-transparent border-none text-sm font-medium focus:outline-none w-32 text-foreground placeholder:text-muted-foreground/50"
+                  placeholder="输入昵称..."
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleSaveNickname()
@@ -90,18 +89,19 @@ export function HomeHeader({ onAnnouncementClick }: HomeHeaderProps) {
                 />
                 <button
                   onClick={handleSaveNickname}
-                  className="p-1 hover:bg-primary/10 rounded-full text-primary transition-colors"
+                  className="p-1 hover:bg-green-500/10 rounded-full text-green-600 transition-colors"
                 >
-                  <Check className="w-3.5 h-3.5" />
+                  <Check className="w-4 h-4" />
                 </button>
               </div>
             ) : (
               <button
                 onClick={() => setIsEditing(true)}
-                className="group flex items-center gap-2 px-3 py-1 bg-secondary/50 hover:bg-primary/10 border border-border/50 hover:border-primary/30 rounded-full transition-all duration-300"
+                className="group flex items-center gap-2 px-4 py-1.5 bg-secondary/40 hover:bg-secondary/60 border border-transparent hover:border-border/50 rounded-full transition-all duration-300"
               >
-                <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary">{userInfo.nickname}</span>
-                <Pencil className="w-3 h-3 text-muted-foreground/50 group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all" />
+                <span className="text-sm text-muted-foreground">你好,</span>
+                <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{userInfo.nickname}</span>
+                <Pencil className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all -ml-1 group-hover:ml-0" />
               </button>
             )}
           </div>

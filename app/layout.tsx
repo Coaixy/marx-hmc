@@ -42,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={`font-sans antialiased min-h-screen pb-20`}>
+      <body className={`${_geist.variable} ${_geistMono.variable} ${_notoChinese.variable} font-sans antialiased min-h-screen pb-20`}>
         <SubjectProvider>
           {children}
           <BottomNavigation />

@@ -1,16 +1,17 @@
 "use client"
 
-import Image from "next/image"
 import {
   Dialog,
   DialogContent,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogHeader
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Megaphone, BookOpen, Puzzle, Sparkles } from "lucide-react"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Badge } from "@/components/ui/badge"
+import { Megaphone, BookOpen, Puzzle, Sparkles, Rocket } from "lucide-react"
 
 interface AnnouncementDialogProps {
   open: boolean
@@ -20,56 +21,93 @@ interface AnnouncementDialogProps {
 export function AnnouncementDialog({ open, onOpenChange }: AnnouncementDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] flex flex-col glass-card">
-        <DialogHeader className="shrink-0">
-          <DialogTitle className="flex items-center gap-2">
-            <Megaphone className="w-5 h-5 text-primary" />
-            🎉 最新更新
+      <DialogContent className="sm:max-w-[460px] flex flex-col p-0 gap-0 overflow-hidden border-none shadow-2xl">
+        {/* Decorative Header Background */}
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-br from-primary/20 via-primary/5 to-transparent pointer-events-none" />
+
+        <DialogHeader className="p-6 pb-4 z-10">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 ring-1 ring-primary/20 shadow-sm">
+            <Megaphone className="w-6 h-6 text-primary" />
+          </div>
+          <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+            最新动态
+            <Badge variant="secondary" className="rounded-full px-2.5 bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">
+              v1.2.0
+            </Badge>
           </DialogTitle>
-          <DialogDescription className="text-left pt-2">
-            持续优化，助你高效备考！
+          <DialogDescription className="text-base pt-1 text-muted-foreground">
+            我们持续优化产品体验，助你更高效地备考！
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto">
-          <div className="space-y-4 py-4">
-            <div className="text-sm text-slate-600 dark:text-slate-300 space-y-3">
-              
-              <div className="bg-primary/5 dark:bg-primary/10 p-3 rounded-lg border border-primary/10">
-                <div className="flex items-center gap-2 mb-2">
-                    <BookOpen className="w-4 h-4 text-primary" />
-                    <p className="font-semibold text-primary">题库上新</p>
+        <ScrollArea className="flex-1 max-h-[60vh]">
+          <div className="px-6 py-2 space-y-6 pb-6">
+            
+            {/* Feature 1 */}
+            <div className="flex gap-4 group">
+              <div className="shrink-0 mt-0.5">
+                <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center ring-1 ring-blue-100 dark:ring-blue-800 group-hover:scale-110 transition-transform duration-300">
+                  <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
-                <p>• 新增 <strong>《细胞生物学》</strong> 题库</p>
-                <p>• 包含丰富的章节练习与考点解析</p>
               </div>
-
-              <div className="bg-orange-50 dark:bg-orange-950/20 p-3 rounded-lg border border-orange-200 dark:border-orange-800">
-                <div className="flex items-center gap-2 mb-2">
-                    <Puzzle className="w-4 h-4 text-orange-600" />
-                    <p className="font-semibold text-orange-700 dark:text-orange-300">新增题型</p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-semibold text-foreground">题库上新</h4>
+                  <Badge variant="default" className="bg-blue-600 hover:bg-blue-700 h-5 text-[10px] px-1.5">New</Badge>
                 </div>
-                <p>• 现已支持 <strong>匹配题</strong> 练习</p>
-                <p>• 适配顺序练习、随机刷题模式</p>
-              </div>
-
-              <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
-                <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-slate-600" />
-                    <p className="font-semibold text-slate-700 dark:text-slate-300">功能优化</p>
+                <div className="text-sm text-muted-foreground leading-relaxed space-y-1">
+                  <p>新增 <span className="font-medium text-foreground">《细胞生物学》</span> 专项题库，包含 500+ 精选习题与详细考点解析，覆盖核心章节。</p>
                 </div>
-                <p>• 优化<strong>随机刷题</strong>逻辑：采用 Fisher-Yates 算法实现真随机排序，彻底解决题目重复出现的问题</p>
-                <p>• 界面细节优化，体验更流畅</p>
-                <p>• 修复已知问题，提升稳定性</p>
               </div>
-
             </div>
-          </div>
-        </div>
 
-        <DialogFooter className="shrink-0 pt-2">
-          <Button className="w-full" onClick={() => onOpenChange(false)}>
-            开始学习
+            {/* Feature 2 */}
+            <div className="flex gap-4 group">
+              <div className="shrink-0 mt-0.5">
+                <div className="w-10 h-10 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center ring-1 ring-orange-100 dark:ring-orange-800 group-hover:scale-110 transition-transform duration-300">
+                  <Puzzle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-semibold text-foreground">新增题型</h4>
+                  <Badge variant="outline" className="text-orange-600 border-orange-200 bg-orange-50 dark:bg-orange-950/30 dark:border-orange-800 h-5 text-[10px] px-1.5">Feature</Badge>
+                </div>
+                <div className="text-sm text-muted-foreground leading-relaxed">
+                  <p>全新支持<span className="font-medium text-foreground">匹配题</span>（连线题）练习模式，完美适配顺序练习与随机刷题场景。</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="flex gap-4 group">
+              <div className="shrink-0 mt-0.5">
+                <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center ring-1 ring-indigo-100 dark:ring-indigo-800 group-hover:scale-110 transition-transform duration-300">
+                  <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-semibold text-foreground">体验优化</h4>
+                  <Badge variant="secondary" className="h-5 text-[10px] px-1.5">Optimization</Badge>
+                </div>
+                <div className="text-sm text-muted-foreground leading-relaxed space-y-1">
+                  <ul className="list-disc list-outside pl-3 space-y-1 marker:text-muted-foreground/50">
+                    <li>优化随机算法，彻底解决题目重复问题</li>
+                    <li>界面动效升级，操作更丝滑</li>
+                    <li>修复了若干已知 Bug，提升稳定性</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </ScrollArea>
+
+        <DialogFooter className="p-6 pt-2 bg-muted/20 z-10">
+          <Button className="w-full h-11 text-base font-medium shadow-lg hover:shadow-primary/25 transition-all duration-300 group" onClick={() => onOpenChange(false)}>
+            <Rocket className="w-4 h-4 mr-2 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+            开始探索
           </Button>
         </DialogFooter>
       </DialogContent>
