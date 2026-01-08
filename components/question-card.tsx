@@ -1,9 +1,18 @@
 "use client"
 
-import React, { useMemo } from "react"
+import React, { useMemo, useState } from "react"
 import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion, MatchingQuestion } from "@/lib/question-data"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { highlightNegativeKeywords, NEGATIVE_KEYWORDS, parseMatchingOptions } from "@/lib/utils"
+import { Share2, Copy, Check } from "lucide-react"
+import { toast } from "sonner"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 import { AiExplanation } from "@/components/ai-explanation"
 import { QuestionComments } from "@/components/question-comments"
@@ -29,6 +38,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   submitted = false,
   showComments = true,
 }) => {
+  const [copied, setCopied] = useState(false)
+
   const parsedMatchingOptions = useMemo(() => {
     if (type === "matching") {
       return parseMatchingOptions((question as MatchingQuestion).选项)
@@ -143,25 +154,123 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     }
   }
 
+  const generateShareText = () => {
+    let text = `【${getQuestionTypeLabel()}】\n\n`
+    text += `题目：${question.题干}\n\n`
+
+    // 添加选项
+    if (type === "trueFalse") {
+      text += `A. √\nB. ×\n\n`
+    } else if (type === "matching") {
+      text += `选项：\n`
+      options.forEach(opt => {
+        text += `${opt}. ${parsedMatchingOptions[opt]}\n`
+      })
+      text += `\n`
+    } else {
+      options.forEach(opt => {
+        const optionText = (question as any)[opt]
+        if (optionText) {
+          text += `${opt}. ${getOptionText(optionText, opt)}\n`
+        }
+      })
+      text += `\n`
+    }
+
+    // 添加答案
+    text += `正确答案：${question.答案}\n`
+
+    return text
+  }
+
+  const handleCopyText = async () => {
+    try {
+      const text = generateShareText()
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      toast.success("题目已复制到剪贴板")
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      console.error("复制失败:", error)
+      toast.error("复制失败，请重试")
+    }
+  }
+
+  const handleShare = async () => {
+    const text = generateShareText()
+
+    // 尝试使用 Web Share API
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${getQuestionTypeLabel()} - 第${questionNumber}题`,
+          text: text,
+        })
+        toast.success("分享成功")
+      } catch (error) {
+        // 用户取消分享或不支持
+        if ((error as Error).name !== "AbortError") {
+          console.error("分享失败:", error)
+        }
+      }
+    } else {
+      // 降级到复制
+      handleCopyText()
+    }
+  }
+
   return (
     <Card className="w-full border-primary/20">
       <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-lg">
-            {getQuestionTypeLabel()} {questionNumber}
-            /{totalQuestions}
-          </CardTitle>
-          {type !== "trueFalse" && type !== "matching" && (question as SingleChoiceQuestion | MultipleChoiceQuestion).难度 && (
-            <span className="text-sm px-3 py-1 bg-secondary rounded-full">
-              {(question as SingleChoiceQuestion | MultipleChoiceQuestion).难度}
-            </span>
-          )}
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex-1">
+            <CardTitle className="text-lg">
+              {getQuestionTypeLabel()} {questionNumber}
+              /{totalQuestions}
+            </CardTitle>
+            {type !== "trueFalse" && (
+              <p className="text-sm text-muted-foreground mt-2">
+                {(question as any).章节}
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {type !== "trueFalse" && type !== "matching" && (question as SingleChoiceQuestion | MultipleChoiceQuestion).难度 && (
+              <span className="text-sm px-3 py-1 bg-secondary rounded-full whitespace-nowrap">
+                {(question as SingleChoiceQuestion | MultipleChoiceQuestion).难度}
+              </span>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Share2 className="w-4 h-4" />
+                  分享
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={handleCopyText} className="cursor-pointer gap-2">
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4 text-green-600" />
+                      <span>已复制</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      <span>复制题目</span>
+                    </>
+                  )}
+                </DropdownMenuItem>
+                {navigator.share && (
+                  <DropdownMenuItem onClick={handleShare} className="cursor-pointer gap-2">
+                    <Share2 className="w-4 h-4" />
+                    <span>分享到...</span>
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-        {type !== "trueFalse" && (
-          <p className="text-sm text-muted-foreground mt-2">
-            {(question as any).章节}
-          </p>
-        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-base font-medium leading-relaxed">{renderHighlightedText(question.题干)}</p>
