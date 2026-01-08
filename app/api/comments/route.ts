@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import crypto from 'crypto';
+import { filterBlockedWords } from '@/lib/utils';
 
 // Get comments for a question
 export async function GET(req: Request) {
@@ -33,7 +34,14 @@ export async function GET(req: Request) {
 
     console.log('Database query result:', rows.length, 'comments found')
 
-    return NextResponse.json(rows);
+    // 过滤屏蔽词
+    const filteredRows = rows.map((row: any) => ({
+      ...row,
+      nickname: filterBlockedWords(row.nickname),
+      content: filterBlockedWords(row.content)
+    }));
+
+    return NextResponse.json(filteredRows);
   } catch (error) {
     console.error('Get Comments Error:', error);
     return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
@@ -49,11 +57,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // 过滤屏蔽词
+    const filteredNickname = nickname ? filterBlockedWords(nickname) : nickname;
+    const filteredContent = filterBlockedWords(content);
+
     // 1. Ensure user exists in device_user_config
-    if (nickname) {
+    if (filteredNickname) {
       await pool.execute(
         'INSERT INTO device_user_config (device_id, nickname) VALUES (?, ?) ON DUPLICATE KEY UPDATE last_active_at = CURRENT_TIMESTAMP',
-        [deviceId, nickname]
+        [deviceId, filteredNickname]
       );
     }
 
@@ -62,7 +74,7 @@ export async function POST(req: Request) {
 
     const [result]: any = await pool.execute(
       'INSERT INTO question_comments (question_hash, device_id, content, ip_address, parent_id, is_ai) VALUES (?, ?, ?, ?, ?, ?)',
-      [questionHash, deviceId, content, ip, parentId || 0, isAi ? 1 : 0]
+      [questionHash, deviceId, filteredContent, ip, parentId || 0, isAi ? 1 : 0]
     );
 
     const commentId = result.insertId;

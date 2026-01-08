@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { filterBlockedWords } from '@/lib/utils';
 
 export async function GET(req: Request) {
   try {
@@ -26,7 +27,13 @@ export async function GET(req: Request) {
 
     const [rows]: any = await pool.query(query, [examType, limit]);
 
-    return NextResponse.json(rows);
+    // 过滤屏蔽词
+    const filteredRows = rows.map((row: any) => ({
+      ...row,
+      nickname: filterBlockedWords(row.nickname)
+    }));
+
+    return NextResponse.json(filteredRows);
   } catch (error) {
     console.error('Get Ranking Error:', error);
     return NextResponse.json({ error: 'Failed to fetch ranking' }, { status: 500 });
