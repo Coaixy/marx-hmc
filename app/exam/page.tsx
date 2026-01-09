@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getExamQuestions } from "@/lib/question-utils"
 import { storage } from "@/lib/storage"
 import { ChevronLeft, Home, Share2 } from "lucide-react"
-import html2canvas from "html2canvas"
+import { toPng } from "html-to-image"
 import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion, MatchingQuestion } from "@/lib/question-data"
 import type { AnswerRecord } from "@/lib/storage"
 import type { ExamQuestionWithIndex } from "@/lib/question-utils"
@@ -29,6 +29,7 @@ export default function ExamPage() {
   const [wrongAnswerCount, setWrongAnswerCount] = useState(0)
   const [startTime, setStartTime] = useState<number>(0)
   const resultRef = useRef<HTMLDivElement>(null)
+  const shareRef = useRef<HTMLDivElement>(null)
   const [sharing, setSharing] = useState(false)
 
   useEffect(() => {
@@ -343,57 +344,48 @@ export default function ExamPage() {
   }
 
   const handleShareResult = async () => {
-    if (!resultRef.current) return
+    // Generate image from the hidden premium card
+    if (!shareRef.current) return
     setSharing(true)
 
     try {
-      // Find the card element to capture
-      const element = resultRef.current
+      const element = shareRef.current
 
-      const canvas = await html2canvas(element, {
-        useCORS: true,
-        scale: 2, // Better quality
-        backgroundColor: null, // Capture background properly
-        // ignoreElements: (element) => element.tagName === 'BUTTON' // Hide buttons if needed, but we might want some context
-        onclone: (doc) => {
-          // Optional: hide buttons in the clone
-          const buttons = doc.querySelectorAll('button')
-          buttons.forEach(b => b.style.display = 'none')
-          const inputs = doc.querySelectorAll('input')
-          inputs.forEach(i => i.style.border = 'none')
-        }
+      const dataUrl = await toPng(element, {
+        cacheBust: true,
+        backgroundColor: '#ffffff',
+        // No filter needed as we design the share card specifically for sharing
       })
 
-      canvas.toBlob(async (blob) => {
-        if (!blob) {
-          setSharing(false)
-          return
+      // Convert dataUrl to blob for sharing
+      const res = await fetch(dataUrl)
+      const blob = await res.blob()
+
+      const filename = `exam-result-${subject?.id}-${Date.now()}.png`
+      const file = new File([blob], filename, { type: 'image/png' })
+
+      const totalQ = totalSingle + totalMultiple + totalTrueFalse + totalMatching
+      const currentCorrectCount = totalQ - wrongAnswerCount
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: '我的考试成绩',
+            text: `我在${subject?.name}模拟考试中获得了${Math.round((currentCorrectCount / totalQ) * 100)}%的正确率！`,
+          })
+        } catch (err) {
+          console.error('Share failed:', err)
         }
+      } else {
+        // Fallback to download
+        const link = document.createElement("a")
+        link.href = dataUrl
+        link.download = filename
+        link.click()
+      }
+      setSharing(false)
 
-        const filename = `exam-result-${subject?.id}-${Date.now()}.png`
-        const file = new File([blob], filename, { type: 'image/png' })
-
-        const currentCorrectCount = totalQuestions - wrongAnswerCount
-
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({
-              files: [file],
-              title: '我的考试成绩',
-              text: `我在${subject?.name}模拟考试中获得了${Math.round((currentCorrectCount / totalQuestions) * 100)}%的正确率！`,
-            })
-          } catch (err) {
-            console.error('Share failed:', err)
-          }
-        } else {
-          // Fallback to download
-          const link = document.createElement("a")
-          link.href = canvas.toDataURL("image/png")
-          link.download = filename
-          link.click()
-        }
-        setSharing(false)
-      }, 'image/png')
     } catch (err) {
       console.error("Failed to generate image:", err)
       setSharing(false)
@@ -446,6 +438,7 @@ export default function ExamPage() {
     return (
       <div className="min-h-screen bg-transparent p-4 flex items-center">
         <div className="max-w-md mx-auto w-full">
+          {/* Visible Result Card */}
           <Card ref={resultRef} className="bg-background">
             <CardHeader>
               <CardTitle className="text-2xl text-center">考试成绩 - {subject?.name}</CardTitle>
@@ -519,6 +512,66 @@ export default function ExamPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Hidden Premium Share Card (Rendered off-screen) */}
+          <div className="fixed left-[-9999px] top-[-9999px]">
+            <div
+              ref={shareRef}
+              className="w-[375px] bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-6 text-white"
+              style={{
+                fontFamily: '"Noto Sans SC", sans-serif',
+              }}
+            >
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
+                <div className="text-center space-y-2 mb-8">
+                  <h2 className="text-xl font-bold opacity-90">模拟考试成绩单</h2>
+                  <h1 className="text-2xl font-black">{subject?.name}</h1>
+                  <p className="text-sm opacity-70">{new Date().toLocaleDateString()}</p>
+                </div>
+
+                <div className="text-center py-8 relative">
+                  <div className="absolute inset-0 bg-white/5 rounded-full blur-3xl transform scale-75"></div>
+                  <span className="relative z-10 text-8xl font-black tracking-tighter drop-shadow-lg">
+                    {accuracy}
+                    <span className="text-4xl text-white/80">%</span>
+                  </span>
+                  <p className="relative z-10 text-lg font-medium mt-2 bg-white/20 inline-block px-4 py-1 rounded-full">正确率</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 my-8">
+                  <div className="bg-white/10 rounded-xl p-4 text-center border border-white/10">
+                    <p className="text-3xl font-bold text-green-300">{totalCorrect}</p>
+                    <p className="text-xs opacity-70">答对题目</p>
+                  </div>
+                  <div className="bg-white/10 rounded-xl p-4 text-center border border-white/10">
+                    <p className="text-3xl font-bold text-red-300">{wrongAnswerCount}</p>
+                    <p className="text-xs opacity-70">答错题目</p>
+                  </div>
+                </div>
+
+                <div className="border-t border-white/20 pt-6 mt-6">
+                  <div className="flex items-center justify-between">
+                    <div className="text-left">
+                      <p className="text-xs opacity-60">考生</p>
+                      <p className="font-bold text-lg">{userInfo.nickname}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs opacity-60">耗时</p>
+                      <p className="font-bold text-lg">
+                        {Math.floor((Date.now() - startTime) / 60000)}m
+                        {Math.floor(((Date.now() - startTime) % 60000) / 1000)}s
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 text-center opacity-60 text-xs">
+                <p>Powered by Marix</p>
+                <p>扫码挑战我的成绩</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )
