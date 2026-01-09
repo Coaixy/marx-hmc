@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { QuestionCard } from "@/components/question-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getExamQuestions } from "@/lib/question-utils"
 import { storage } from "@/lib/storage"
-import { ChevronLeft, Home } from "lucide-react"
+import { ChevronLeft, Home, Share2 } from "lucide-react"
+import html2canvas from "html2canvas"
 import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion, MatchingQuestion } from "@/lib/question-data"
 import type { AnswerRecord } from "@/lib/storage"
 import type { ExamQuestionWithIndex } from "@/lib/question-utils"
@@ -27,6 +28,8 @@ export default function ExamPage() {
   const [mounted, setMounted] = useState(false)
   const [wrongAnswerCount, setWrongAnswerCount] = useState(0)
   const [startTime, setStartTime] = useState<number>(0)
+  const resultRef = useRef<HTMLDivElement>(null)
+  const [sharing, setSharing] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -339,6 +342,64 @@ export default function ExamPage() {
     return 0
   }
 
+  const handleShareResult = async () => {
+    if (!resultRef.current) return
+    setSharing(true)
+
+    try {
+      // Find the card element to capture
+      const element = resultRef.current
+
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        scale: 2, // Better quality
+        backgroundColor: null, // Capture background properly
+        // ignoreElements: (element) => element.tagName === 'BUTTON' // Hide buttons if needed, but we might want some context
+        onclone: (doc) => {
+          // Optional: hide buttons in the clone
+          const buttons = doc.querySelectorAll('button')
+          buttons.forEach(b => b.style.display = 'none')
+          const inputs = doc.querySelectorAll('input')
+          inputs.forEach(i => i.style.border = 'none')
+        }
+      })
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          setSharing(false)
+          return
+        }
+
+        const filename = `exam-result-${subject?.id}-${Date.now()}.png`
+        const file = new File([blob], filename, { type: 'image/png' })
+
+        const currentCorrectCount = totalQuestions - wrongAnswerCount
+
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: '我的考试成绩',
+              text: `我在${subject?.name}模拟考试中获得了${Math.round((currentCorrectCount / totalQuestions) * 100)}%的正确率！`,
+            })
+          } catch (err) {
+            console.error('Share failed:', err)
+          }
+        } else {
+          // Fallback to download
+          const link = document.createElement("a")
+          link.href = canvas.toDataURL("image/png")
+          link.download = filename
+          link.click()
+        }
+        setSharing(false)
+      }, 'image/png')
+    } catch (err) {
+      console.error("Failed to generate image:", err)
+      setSharing(false)
+    }
+  }
+
   if (!mounted) return null
 
   if (!examStarted) {
@@ -385,7 +446,7 @@ export default function ExamPage() {
     return (
       <div className="min-h-screen bg-transparent p-4 flex items-center">
         <div className="max-w-md mx-auto w-full">
-          <Card>
+          <Card ref={resultRef} className="bg-background">
             <CardHeader>
               <CardTitle className="text-2xl text-center">考试成绩 - {subject?.name}</CardTitle>
             </CardHeader>
@@ -436,7 +497,12 @@ export default function ExamPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 pt-2">
+                <Button onClick={handleShareResult} variant="outline" className="w-full gap-2" disabled={sharing}>
+                  <Share2 className="w-4 h-4" />
+                  {sharing ? "生成中..." : "分享成绩单"}
+                </Button>
+
                 <Link href="/ranking" className="block">
                   <Button variant="default" className="w-full">
                     查看排行榜
