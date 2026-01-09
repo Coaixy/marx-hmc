@@ -116,56 +116,56 @@ export default function ExamPage() {
 
   const handleNext = () => {
     if (currentPhase === "single") {
-        if (questionIndex + 1 < totalSingle) {
-            setQuestionIndex(questionIndex + 1)
+      if (questionIndex + 1 < totalSingle) {
+        setQuestionIndex(questionIndex + 1)
+      } else {
+        // Try move to multiple
+        if (totalMultiple > 0) {
+          setCurrentPhase("multiple")
+          setQuestionIndex(0)
+        } else if (totalTrueFalse > 0) {
+          setCurrentPhase("trueFalse")
+          setQuestionIndex(0)
+        } else if (totalMatching > 0) {
+          setCurrentPhase("matching")
+          setQuestionIndex(0)
         } else {
-            // Try move to multiple
-            if (totalMultiple > 0) {
-                setCurrentPhase("multiple")
-                setQuestionIndex(0)
-            } else if (totalTrueFalse > 0) {
-                setCurrentPhase("trueFalse")
-                setQuestionIndex(0)
-            } else if (totalMatching > 0) {
-                setCurrentPhase("matching")
-                setQuestionIndex(0)
-            } else {
-                finishExam()
-            }
+          finishExam()
         }
+      }
     } else if (currentPhase === "multiple") {
-        if (questionIndex + 1 < totalMultiple) {
-            setQuestionIndex(questionIndex + 1)
+      if (questionIndex + 1 < totalMultiple) {
+        setQuestionIndex(questionIndex + 1)
+      } else {
+        // Try move to trueFalse
+        if (totalTrueFalse > 0) {
+          setCurrentPhase("trueFalse")
+          setQuestionIndex(0)
+        } else if (totalMatching > 0) {
+          setCurrentPhase("matching")
+          setQuestionIndex(0)
         } else {
-            // Try move to trueFalse
-            if (totalTrueFalse > 0) {
-                setCurrentPhase("trueFalse")
-                setQuestionIndex(0)
-            } else if (totalMatching > 0) {
-                setCurrentPhase("matching")
-                setQuestionIndex(0)
-            } else {
-                finishExam()
-            }
+          finishExam()
         }
+      }
     } else if (currentPhase === "trueFalse") {
-        if (questionIndex + 1 < totalTrueFalse) {
-             setQuestionIndex(questionIndex + 1)
+      if (questionIndex + 1 < totalTrueFalse) {
+        setQuestionIndex(questionIndex + 1)
+      } else {
+        // Try move to matching
+        if (totalMatching > 0) {
+          setCurrentPhase("matching")
+          setQuestionIndex(0)
         } else {
-            // Try move to matching
-            if (totalMatching > 0) {
-                setCurrentPhase("matching")
-                setQuestionIndex(0)
-            } else {
-                finishExam()
-            }
+          finishExam()
         }
+      }
     } else if (currentPhase === "matching") {
-        if (questionIndex + 1 < totalMatching) {
-            setQuestionIndex(questionIndex + 1)
-        } else {
-            finishExam()
-        }
+      if (questionIndex + 1 < totalMatching) {
+        setQuestionIndex(questionIndex + 1)
+      } else {
+        finishExam()
+      }
     }
   }
 
@@ -175,30 +175,30 @@ export default function ExamPage() {
 
     let remaining = globalIndex
     if (remaining < totalSingle) {
-        setCurrentPhase("single")
-        setQuestionIndex(remaining)
-        return
+      setCurrentPhase("single")
+      setQuestionIndex(remaining)
+      return
     }
     remaining -= totalSingle
 
     if (remaining < totalMultiple) {
-        setCurrentPhase("multiple")
-        setQuestionIndex(remaining)
-        return
+      setCurrentPhase("multiple")
+      setQuestionIndex(remaining)
+      return
     }
     remaining -= totalMultiple
 
     if (remaining < totalTrueFalse) {
-        setCurrentPhase("trueFalse")
-        setQuestionIndex(remaining)
-        return
+      setCurrentPhase("trueFalse")
+      setQuestionIndex(remaining)
+      return
     }
     remaining -= totalTrueFalse
 
     if (remaining < totalMatching) {
-        setCurrentPhase("matching")
-        setQuestionIndex(remaining)
-        return
+      setCurrentPhase("matching")
+      setQuestionIndex(remaining)
+      return
     }
   }
 
@@ -300,7 +300,7 @@ export default function ExamPage() {
     const totalQuestions = totalSingle + totalMultiple + totalTrueFalse + totalMatching
     const accuracy = Math.round((correctCount / totalQuestions) * 100)
     const durationMs = Date.now() - startTime
-    
+
     storage.saveExamRecord(subjectId, {
       id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9),
       totalQuestions,
@@ -358,13 +358,12 @@ export default function ExamPage() {
               <div className="bg-secondary/20 p-4 rounded-lg">
                 <p className="font-semibold mb-2">考试说明：</p>
                 <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>• 单选题：25道</li>
-                  <li>• 多选题：5道</li>
-                  <li>• 判断题：10道</li>
-                  <li>• 匹配题：最多5道（如题库有）</li>
-                  <li>• 共计：最多45题</li>
-                  <li>• 随机抽取，每次不同</li>
-                  <li className="text-xs italic pt-1 text-muted-foreground/80">*如某题型不足将调整数量</li>
+                  <li>• 单选题：根据题库随机抽取 (上限50题)</li>
+                  <li>• 多选题：根据题库随机抽取 (上限20题)</li>
+                  <li>• 判断题：根据题库随机抽取 (上限20题)</li>
+                  <li>• 匹配题：根据题库随机抽取 (上限10题)</li>
+                  <li>• 采用加强随机算法，每次题目均不同</li>
+                  <li className="text-xs italic pt-1 text-muted-foreground/80">*实际出题数量取决于题库当前拥有的题目总量</li>
                 </ul>
               </div>
               <Button onClick={startExam} className="w-full" size="lg">
@@ -413,15 +412,15 @@ export default function ExamPage() {
               <div className="p-3 bg-secondary/20 rounded-lg space-y-2">
                 <p className="text-xs font-medium text-muted-foreground">你的昵称 (将显示在排行榜):</p>
                 <div className="flex gap-2">
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     defaultValue={userInfo.nickname}
                     className="flex-1 bg-background border border-border rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                     onBlur={(e) => {
                       if (e.target.value && e.target.value !== userInfo.nickname) {
                         const newNickname = e.target.value;
                         storage.updateUserInfo({ nickname: newNickname });
-                        
+
                         // Sync to database
                         fetch('/api/user/update-nickname', {
                           method: 'POST',
@@ -538,6 +537,7 @@ export default function ExamPage() {
             onAnswerSelect={handleAnswerSelect}
             selectedAnswer={selectedAnswer}
             submitted={submitted}
+            showComments={false}
           />
         </div>
 
