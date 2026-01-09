@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { useSubject } from "@/components/subject-provider"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, Trophy, Medal, Award, Crown, Sparkles } from "lucide-react"
+import { ChevronLeft, Trophy, Medal, Award, Crown } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { SUBJECTS } from "@/lib/question-data"
 import { storage } from "@/lib/storage"
 
 interface RankingRecord {
@@ -53,225 +52,230 @@ export default function RankingPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`
+    return `${date.getMonth() + 1}-${date.getDate()}`
   }
 
-  const getRankStyle = (index: number) => {
-    switch(index) {
-      case 0: // 第一名
+  const getRankConfig = (index: number) => {
+    switch (index) {
+      case 0:
         return {
-          bgClass: "bg-gradient-to-r from-yellow-50 via-amber-50 to-yellow-50 dark:from-yellow-950/30 dark:via-amber-950/30 dark:to-yellow-950/30 border-2 border-yellow-300/50 dark:border-yellow-700/50 shadow-lg shadow-yellow-200/50 dark:shadow-yellow-900/30",
-          textClass: "text-yellow-600 dark:text-yellow-400",
+          color: "text-yellow-600 dark:text-yellow-400",
+          bgColor: "bg-yellow-100 dark:bg-yellow-900/30",
+          borderColor: "border-yellow-200 dark:border-yellow-700",
           icon: <Crown className="w-5 h-5" />,
-          badge: "👑 冠军",
-          badgeClass: "bg-gradient-to-r from-yellow-400 to-amber-500 text-white"
+          podiumStop: "from-yellow-50/80 to-yellow-100/20 dark:from-yellow-900/20 dark:to-transparent",
+          highlightGradient: "via-yellow-400/50"
         }
-      case 1: // 第二名
+      case 1:
         return {
-          bgClass: "bg-gradient-to-r from-slate-50 via-gray-50 to-slate-50 dark:from-slate-900/30 dark:via-gray-900/30 dark:to-slate-900/30 border-2 border-slate-300/50 dark:border-slate-700/50 shadow-md shadow-slate-200/50 dark:shadow-slate-900/30",
-          textClass: "text-slate-500 dark:text-slate-400",
+          color: "text-slate-600 dark:text-slate-400",
+          bgColor: "bg-slate-100 dark:bg-slate-800",
+          borderColor: "border-slate-200 dark:border-slate-700",
           icon: <Medal className="w-5 h-5" />,
-          badge: "🥈 亚军",
-          badgeClass: "bg-gradient-to-r from-slate-400 to-gray-500 text-white"
+          podiumStop: "from-slate-50/80 to-slate-100/20 dark:from-slate-800/20 dark:to-transparent",
+          highlightGradient: "via-slate-400/50"
         }
-      case 2: // 第三名
+      case 2:
         return {
-          bgClass: "bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 dark:from-orange-950/30 dark:via-amber-950/30 dark:to-orange-950/30 border-2 border-orange-300/50 dark:border-orange-700/50 shadow-md shadow-orange-200/50 dark:shadow-orange-900/30",
-          textClass: "text-orange-600 dark:text-orange-400",
+          color: "text-orange-600 dark:text-orange-400",
+          bgColor: "bg-orange-100 dark:bg-orange-900/30",
+          borderColor: "border-orange-200 dark:border-orange-700",
           icon: <Award className="w-5 h-5" />,
-          badge: "🥉 季军",
-          badgeClass: "bg-gradient-to-r from-orange-400 to-amber-500 text-white"
+          podiumStop: "from-orange-50/80 to-orange-100/20 dark:from-orange-900/20 dark:to-transparent",
+          highlightGradient: "via-orange-400/50"
         }
       default:
         return {
-          bgClass: "",
-          textClass: "text-muted-foreground",
+          color: "text-muted-foreground",
+          bgColor: "bg-muted/50",
+          borderColor: "border-transparent",
           icon: null,
-          badge: null,
-          badgeClass: ""
+          podiumStop: "",
+          highlightGradient: ""
         }
     }
   }
 
+  const SkeletonRow = () => (
+    <div className="flex items-center justify-between py-4 px-4">
+      <div className="flex items-center gap-4">
+        <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+        <div className="flex flex-col gap-2">
+          <div className="w-24 h-3 bg-muted animate-pulse rounded" />
+          <div className="w-16 h-2 bg-muted animate-pulse rounded" />
+        </div>
+      </div>
+      <div className="flex gap-6">
+        <div className="w-8 h-4 bg-muted animate-pulse rounded" />
+        <div className="w-12 h-4 bg-muted animate-pulse rounded" />
+      </div>
+    </div>
+  )
+
   return (
-    <div className="min-h-screen bg-transparent p-4 md:p-8 pb-32">
-      <div className="max-w-2xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background p-4 md:p-8 pb-32">
+      <div className="max-w-2xl mx-auto space-y-8">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <Link href="/">
-            <Button variant="ghost" size="sm">
-              <ChevronLeft className="w-4 h-4 mr-2" /> 返回首页
+            <Button variant="ghost" size="sm" className="-ml-2 text-muted-foreground hover:text-foreground transition-colors group">
+              <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-0.5 transition-transform" />
+              返回
             </Button>
           </Link>
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            {subject?.name}
-          </h1>
-          <div className="w-20"></div> {/* Spacer */}
+          <div className="flex flex-col items-end">
+            <h1 className="text-lg font-semibold tracking-tight">
+              {subject?.name || "..."}排行榜
+            </h1>
+            <p className="text-[10px] text-muted-foreground">Top 50 Masters</p>
+          </div>
         </div>
 
-        <Card className="border-none shadow-xl bg-background/50 backdrop-blur-md">
-          {/* 前三名领奖台 */}
-          {rankings.length >= 3 && (
-            <div className="p-6 pb-4 border-b border-border/50">
-              <div className="flex items-end justify-center gap-4 max-w-md mx-auto">
-                {/* 第二名 */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="flex flex-col items-center flex-1"
-                >
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-300 to-gray-400 dark:from-slate-600 dark:to-gray-700 flex items-center justify-center mb-2 ring-4 ring-slate-200 dark:ring-slate-800 shadow-lg">
-                    <Medal className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="text-center mb-2">
-                    <div className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">🥈</div>
-                    <div className="text-sm font-semibold max-w-[100px] break-words" title={rankings[1]?.nickname}>{rankings[1]?.nickname}</div>
-                    <div className="text-lg font-bold text-slate-600 dark:text-slate-400">{rankings[1]?.score}%</div>
-                  </div>
-                  <div className="w-full h-20 bg-gradient-to-t from-slate-300/80 to-slate-200/80 dark:from-slate-700/80 dark:to-slate-600/80 rounded-t-lg border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-slate-600 dark:text-slate-300">2</span>
-                  </div>
-                </motion.div>
+        <Card className="border-none shadow-none bg-transparent">
+          {/* Podium Section */}
+          {!loading && rankings.length >= 3 && (
+            <div className="mb-0">
+              <div className="flex items-end justify-center gap-4 sm:gap-6 md:gap-8 max-w-sm mx-auto pb-4">
+                {[1, 0, 2].map((rankIndex) => { // Order: 2nd, 1st, 3rd
+                  const record = rankings[rankIndex];
+                  const config = getRankConfig(rankIndex);
 
-                {/* 第一名 */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="flex flex-col items-center flex-1"
-                >
-                  <motion.div
-                    animate={{
-                      y: [0, -5, 0],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  >
-                    <Sparkles className="w-4 h-4 text-yellow-500 mb-1 mx-auto" />
-                  </motion.div>
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 via-amber-400 to-yellow-500 flex items-center justify-center mb-2 ring-4 ring-yellow-300 dark:ring-yellow-600 shadow-xl shadow-yellow-400/50">
-                    <Crown className="w-10 h-10 text-white" />
-                  </div>
-                  <div className="text-center mb-2">
-                    <div className="text-xs font-bold text-yellow-600 dark:text-yellow-400 mb-1">👑 冠军</div>
-                    <div className="text-sm font-bold max-w-[110px] break-words" title={rankings[0]?.nickname}>{rankings[0]?.nickname}</div>
-                    <div className="text-xl font-bold text-yellow-600 dark:text-yellow-400">{rankings[0]?.score}%</div>
-                  </div>
-                  <div className="w-full h-28 bg-gradient-to-t from-yellow-400/80 to-amber-300/80 dark:from-yellow-600/80 dark:to-amber-500/80 rounded-t-lg border-2 border-yellow-400 dark:border-yellow-600 flex items-center justify-center shadow-lg">
-                    <span className="text-3xl font-bold text-yellow-700 dark:text-yellow-200">1</span>
-                  </div>
-                </motion.div>
+                  return (
+                    <motion.div
+                      key={`podium-${rankIndex}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: rankIndex * 0.1 }}
+                      className="flex flex-col items-center flex-1 relative"
+                    >
+                      {/* Rank Icon */}
+                      <div className="relative mb-3 group cursor-default">
+                        <div className={`
+                          w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center 
+                          ring-4 ring-background shadow-xs z-10 relative 
+                          ${config.bgColor} ${config.color}
+                        `}>
+                          {config.icon}
+                        </div>
+                        {rankIndex === 0 && (
+                          <div className="absolute -top-6 left-1/2 -translate-x-1/2 animate-bounce duration-[2000ms]">
+                            <Crown className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                          </div>
+                        )}
+                      </div>
 
-                {/* 第三名 */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="flex flex-col items-center flex-1"
-                >
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 dark:from-orange-600 dark:to-amber-700 flex items-center justify-center mb-2 ring-4 ring-orange-200 dark:ring-orange-800 shadow-lg">
-                    <Award className="w-7 h-7 text-white" />
-                  </div>
-                  <div className="text-center mb-2">
-                    <div className="text-xs font-bold text-orange-600 dark:text-orange-400 mb-1">🥉</div>
-                    <div className="text-sm font-semibold max-w-[100px] break-words" title={rankings[2]?.nickname}>{rankings[2]?.nickname}</div>
-                    <div className="text-lg font-bold text-orange-600 dark:text-orange-400">{rankings[2]?.score}%</div>
-                  </div>
-                  <div className="w-full h-16 bg-gradient-to-t from-orange-300/80 to-amber-200/80 dark:from-orange-700/80 dark:to-amber-600/80 rounded-t-lg border-2 border-orange-300 dark:border-orange-600 flex items-center justify-center">
-                    <span className="text-xl font-bold text-orange-600 dark:text-orange-300">3</span>
-                  </div>
-                </motion.div>
+                      {/* Info */}
+                      <div className="text-center mb-2 space-y-0.5 z-10">
+                        <div className="text-xs font-medium max-w-[80px] truncate mx-auto px-1" title={record.nickname}>
+                          {record.nickname}
+                        </div>
+                        <div className="text-sm font-bold tracking-tight">
+                          {record.score}<span className="text-[10px] font-normal text-muted-foreground ml-0.5">%</span>
+                        </div>
+                      </div>
+
+                      {/* Podium Step */}
+                      <div className={`
+                        w-full rounded-t-lg flex flex-col items-center justify-end pb-2 relative overflow-hidden backdrop-blur-sm
+                        ${rankIndex === 0 ? 'h-24' : rankIndex === 1 ? 'h-16' : 'h-12'}
+                        bg-gradient-to-b ${config.podiumStop}
+                        border-t border-x border-white/20 dark:border-white/5 shadow-sm
+                      `}>
+                        <div className={`absolute top-0 w-full h-[1px] bg-gradient-to-r from-transparent ${config.highlightGradient} to-transparent`} />
+                        <span className={`text-2xl font-bold opacity-30 ${config.color.split(' ')[0]}`}>{rankIndex + 1}</span>
+                      </div>
+                    </motion.div>
+                  )
+                })}
               </div>
             </div>
           )}
 
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between text-sm text-muted-foreground px-2">
+          {/* List Section */}
+          <CardContent className="p-0 bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-sm overflow-hidden">
+
+            {/* List Header */}
+            <div className="flex items-center justify-between py-3 px-5 text-[11px] font-medium text-muted-foreground uppercase tracking-wider bg-muted/20 border-b border-border/40">
               <div className="flex items-center gap-4">
-                <span className="w-8 text-center">排名</span>
-                <span className="w-24">昵称</span>
+                <span className="w-8 text-center">Rank</span>
+                <span>User</span>
               </div>
-              <div className="flex items-center gap-8">
-                <span className="flex items-center gap-1">正确率</span>
-                <span className="flex items-center gap-1 w-20 justify-end">用时</span>
+              <div className="flex items-center gap-6">
+                <span>Score</span>
+                <span className="w-16 text-right">Time</span>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="p-0">
+
             {loading ? (
-              <div className="p-8 text-center text-muted-foreground">加载中...</div>
+              <div className="divide-y divide-border/30">
+                <SkeletonRow />
+                <SkeletonRow />
+                <SkeletonRow />
+                <SkeletonRow />
+                <SkeletonRow />
+              </div>
             ) : rankings.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">暂无记录</div>
+              <div className="p-12 text-center text-muted-foreground text-sm">暂无记录</div>
             ) : (
-              <div className="divide-y divide-border/50">
+              <div className="divide-y divide-border/30">
                 {rankings.map((record, index) => {
                   const isCurrentUser = record.device_id === userInfo.deviceId;
-                  const rankStyle = getRankStyle(index);
+                  const config = getRankConfig(index);
                   const isTopThree = index < 3;
 
                   return (
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 + (index * 0.03) }}
                       key={`${record.device_id}-${record.created_at}`}
-                      className={`flex items-center justify-between p-4 transition-all duration-300 relative overflow-hidden ${
-                        rankStyle.bgClass || (isCurrentUser ? "bg-primary/10" : "hover:bg-secondary/20")
-                      } ${isTopThree ? "my-2 rounded-xl" : ""}`}
+                      className={`
+                        flex items-center justify-between py-3 px-5 group transition-all duration-200
+                        ${isCurrentUser ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-muted/30"}
+                      `}
                     >
-                      {/* 第一名添加闪光效果 */}
-                      {index === 0 && (
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-200/20 to-transparent dark:via-yellow-400/10"
-                          animate={{
-                            x: ["-100%", "100%"],
-                          }}
-                          transition={{
-                            duration: 3,
-                            repeat: Infinity,
-                            repeatDelay: 2,
-                          }}
-                        />
-                      )}
-
-                      <div className="flex items-center gap-4 z-10">
-                        <div className="flex flex-col items-center gap-1">
-                          {rankStyle.icon ? (
-                            <div className={`flex items-center justify-center ${rankStyle.textClass}`}>
-                              {rankStyle.icon}
+                      <div className="flex items-center gap-4">
+                        {/* Rank Badge */}
+                        <div className="flex items-center justify-center w-8">
+                          {isTopThree ? (
+                            <div className={`text-sm font-bold ${config.color}`}>
+                              {index + 1}
                             </div>
                           ) : (
-                            <span className={`w-8 text-center font-bold ${rankStyle.textClass}`}>
+                            <span className="text-xs font-medium text-muted-foreground/60 tabular-nums">
                               {index + 1}
                             </span>
                           )}
                         </div>
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-2 flex-wrap">
+
+                        {/* User Info */}
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2">
                             <span
-                              className={`font-medium break-words ${isCurrentUser ? "text-primary font-bold" : ""} ${isTopThree ? "text-base" : ""}`}
-                              title={record.nickname}
+                              className={`text-sm font-medium truncate max-w-[150px] ${isCurrentUser ? "text-primary" : "text-foreground/90"}`}
                             >
                               {record.nickname}
                             </span>
-                            {isCurrentUser && <span className="text-[10px] bg-primary/20 px-1.5 py-0.5 rounded text-primary">我</span>}
-                            {rankStyle.badge && (
-                              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${rankStyle.badgeClass}`}>
-                                {rankStyle.badge}
+                            {isCurrentUser && (
+                              <span className="text-[9px] bg-primary/10 px-1.5 py-0.5 rounded-full text-primary font-bold">
+                                YOU
                               </span>
                             )}
                           </div>
-                          <span className="text-[10px] text-muted-foreground">{formatDate(record.created_at)}</span>
+                          <span className="text-[10px] text-muted-foreground/50">
+                            {formatDate(record.created_at)}
+                          </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-8 z-10">
-                        <span className={`font-bold text-lg w-12 text-right ${isTopThree ? rankStyle.textClass : ""}`}>
+
+                      {/* Stats */}
+                      <div className="flex items-center gap-6">
+                        <span className={`font-bold text-sm tabular-nums ${isTopThree ? config.color : "text-foreground/80"}`}>
                           {record.score}%
                         </span>
-                        <span className="text-xs text-muted-foreground w-20 text-right">{formatDuration(record.duration_ms)}</span>
+                        <span className="text-xs text-muted-foreground/50 w-16 text-right tabular-nums font-mono">
+                          {formatDuration(record.duration_ms)}
+                        </span>
                       </div>
                     </motion.div>
                   )
@@ -281,11 +285,12 @@ export default function RankingPage() {
           </CardContent>
         </Card>
 
-        <div className="text-center text-xs text-muted-foreground p-4">
-          仅显示前 50 名记录
+        {/* Footer */}
+        <div className="text-center text-[10px] text-muted-foreground/30 pb-4 flex items-center justify-center gap-2">
+          <Trophy className="w-3 h-3" />
+          <span>Keep practicing to reach the top!</span>
         </div>
       </div>
     </div>
   )
 }
-
