@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { MessageSquare } from "lucide-react"
+import { MessageSquare, Hourglass } from "lucide-react"
 
 interface ExamEndedScreenProps {
   examEndDate?: Date
@@ -41,9 +41,10 @@ export function ExamEndedScreen({
       >
         {/* Header Bar */}
         <div className="border-b border-black p-3 flex justify-between items-center bg-gray-50">
-          <div className="flex gap-2">
-            <div className="w-3 h-3 rounded-full border border-black bg-transparent" />
-            <div className="w-3 h-3 rounded-full border border-black bg-black" />
+          <div className="flex gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full border border-black bg-white" />
+            <div className="w-2.5 h-2.5 rounded-full border border-black bg-black" />
+            <div className="w-2.5 h-2.5 rounded-full border border-black bg-transparent" />
           </div>
           <span className="text-[10px] font-bold uppercase tracking-widest">System_Halt</span>
         </div>
@@ -52,10 +53,14 @@ export function ExamEndedScreen({
         <div className="p-8 md:p-12 flex flex-col items-center text-center space-y-8">
 
           {/* Icon/Status */}
-          <div className="relative">
-            <div className="w-16 h-16 border border-black flex items-center justify-center rounded-full">
-              <div className="w-2 h-2 bg-black rounded-full animate-ping absolute" />
-              <div className="w-3 h-3 bg-black rounded-full relative z-10" />
+
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gray-100 rounded-[2rem] rotate-6 scale-90 opacity-0 group-hover:opacity-100 group-hover:rotate-12 transition-all duration-500" />
+            <div className="relative w-24 h-24 bg-white border-2 border-black flex items-center justify-center rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] group-hover:-translate-y-1 transition-all duration-300">
+              <Hourglass className="w-10 h-10 transition-transform duration-700 group-hover:rotate-180" strokeWidth={1.5} />
+            </div>
+            <div className="absolute -top-3 -right-3 bg-black text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest border-2 border-white shadow-sm rotate-12 group-hover:rotate-6 transition-all duration-300">
+              Ended
             </div>
           </div>
 

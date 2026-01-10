@@ -124,14 +124,14 @@ export function FeedbackBoard() {
             placeholder="写下你的想法、建议或反馈..."
             className="min-h-[100px] resize-none border-black focus:ring-0 focus:border-black rounded-none bg-gray-50 placeholder:text-gray-400"
           />
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-gray-500">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <p className="text-xs text-gray-500 leading-relaxed">
               * 请文明发言，共同维护良好的社区环境
             </p>
-            <Button 
-              onClick={handleSubmit} 
+            <Button
+              onClick={handleSubmit}
               disabled={loading || !newComment.trim()}
-              className="rounded-none border border-black bg-black text-white hover:bg-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] active:translate-y-[2px] active:shadow-none transition-all"
+              className="w-full sm:w-auto rounded-none border border-black bg-black text-white hover:bg-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] active:translate-y-[2px] active:shadow-none transition-all"
             >
               {loading ? (
                 <span className="animate-pulse">SENDING...</span>
@@ -157,7 +157,7 @@ export function FeedbackBoard() {
 
         <AnimatePresence mode="popLayout">
           {comments.length === 0 && !fetching ? (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="text-center py-12 border border-dashed border-black opacity-50"
@@ -191,7 +191,7 @@ export function FeedbackBoard() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {comment.device_id === deviceUUID && (
                     <Button
                       variant="ghost"
@@ -204,7 +204,7 @@ export function FeedbackBoard() {
                   )}
                 </div>
 
-                <div className="text-sm leading-relaxed whitespace-pre-wrap pl-10 border-l border-gray-200">
+                <div className="text-sm leading-relaxed whitespace-pre-wrap mt-3 sm:mt-0 sm:pl-10 sm:border-l sm:border-gray-200">
                   {comment.content}
                 </div>
               </motion.div>
