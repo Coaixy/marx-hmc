@@ -43,41 +43,6 @@ export function AnnouncementDialog({ open, onOpenChange }: AnnouncementDialogPro
         <ScrollArea className="flex-1 max-h-[60vh]">
           <div className="px-6 py-2 space-y-6 pb-6">
 
-            {/* Feature 1 */}
-            <div className="flex gap-4 group">
-              <div className="shrink-0 mt-0.5">
-                <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center ring-1 ring-purple-100 dark:ring-purple-800 group-hover:scale-110 transition-transform duration-300">
-                  <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <h4 className="font-semibold text-foreground">听力训练</h4>
-                  <Badge variant="default" className="bg-purple-600 hover:bg-purple-700 h-5 text-[10px] px-1.5">New</Badge>
-                </div>
-                <div className="text-sm text-muted-foreground leading-relaxed space-y-1">
-                  <p>全新上线<span className="font-medium text-foreground">听力训练</span>模块，支持音频播放、语速调节，助你提升听力水平。</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="flex gap-4 group">
-              <div className="shrink-0 mt-0.5">
-                <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center ring-1 ring-blue-100 dark:ring-blue-800 group-hover:scale-110 transition-transform duration-300">
-                  <Rocket className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <h4 className="font-semibold text-foreground">国际化支持</h4>
-                  <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50 dark:bg-blue-950/30 dark:border-blue-800 h-5 text-[10px] px-1.5">New</Badge>
-                </div>
-                <div className="text-sm text-muted-foreground leading-relaxed">
-                  <p>新增<span className="font-medium text-foreground">英文版本</span>，支持多语言切换，为国际用户提供更好的学习体验。</p>
-                </div>
-              </div>
-            </div>
 
             {/* Feature 3 */}
             <div className="flex gap-4 group">
