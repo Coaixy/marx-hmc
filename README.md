@@ -1,4 +1,4 @@
-# 综合刷题助手 (Marix-Yi)
+# 杭州医学院综合刷题助手 (hmc-study-platform)
 
 <div align="center">
 
@@ -6,7 +6,7 @@
 
 一个功能完整、现代化的医学期末刷题平台
 
-[在线体验](https://marix-yi.vercel.app) | [反馈问题](https://github.com/coaixy/marix-yi/issues)
+[反馈问题](https://github.com/coaixy/marix-yi/issues)
 
 </div>
 
