@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSubject } from "@/components/subject-provider"
+import { useSubject } from "@/components/providers/subject-provider"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, Trophy, Medal, Award, Crown } from "lucide-react"

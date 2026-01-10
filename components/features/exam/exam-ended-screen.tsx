@@ -1,6 +1,8 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Link from "next/link"
+import { MessageSquare } from "lucide-react"
 
 interface ExamEndedScreenProps {
   examEndDate?: Date
@@ -83,6 +85,17 @@ export function ExamEndedScreen({
                <span className="bg-black text-white px-1.5 py-0.5 text-[10px]">TERMINATED</span>
              </div>
           </div>
+          
+          {/* Communication Channel Link */}
+          <Link href="/feedback" className="w-full block group">
+            <div className="w-full border border-black p-3 flex items-center justify-center gap-2 hover:bg-black hover:text-white transition-all cursor-pointer">
+              <MessageSquare className="w-4 h-4" />
+              <span className="text-xs font-bold uppercase tracking-widest">Open_Comm_Channel</span>
+            </div>
+            <div className="text-[10px] text-gray-400 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              &gt; Initiate feedback protocol...
+            </div>
+          </Link>
           
         </div>
 

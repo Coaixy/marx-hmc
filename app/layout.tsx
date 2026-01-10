@@ -2,21 +2,21 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono, Noto_Sans_SC } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { BottomNavigation } from "@/components/bottom-navigation"
-import { ExamInterceptor } from "@/components/exam-interceptor"
+import { BottomNavigation } from "@/components/layout/bottom-navigation"
+import { ExamInterceptor } from "@/components/features/exam/exam-interceptor"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 const _notoChinese = Noto_Sans_SC({ subsets: ["latin"] })
 
-import { SubjectProvider } from "@/components/subject-provider"
+import { SubjectProvider } from "@/components/providers/subject-provider"
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: "综合刷题助手",
   description: "高效学习，轻松备考",
-  generator: "v0.app",
+  generator: "Coaixy@outlookc.om",
   icons: {
     icon: [
       {

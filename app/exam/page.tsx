@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { QuestionCard } from "@/components/question-card"
+import { QuestionCard } from "@/components/features/exam/question-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getExamQuestions } from "@/lib/question-utils"
@@ -12,8 +12,8 @@ import { toPng } from "html-to-image"
 import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion, MatchingQuestion } from "@/lib/question-data"
 import type { AnswerRecord } from "@/lib/storage"
 import type { ExamQuestionWithIndex } from "@/lib/question-utils"
-import { AnswerSheet } from "@/components/answer-sheet"
-import { useSubject } from "@/components/subject-provider"
+import { AnswerSheet } from "@/components/features/exam/answer-sheet"
+import { useSubject } from "@/components/providers/subject-provider"
 
 export default function ExamPage() {
   const { subjectId, subject } = useSubject()

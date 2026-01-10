@@ -14,8 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { AiExplanation } from "@/components/ai-explanation"
-import { QuestionComments } from "@/components/question-comments"
+import { AiExplanation } from "@/components/features/exam/ai-explanation"
+import { QuestionComments } from "@/components/features/exam/question-comments"
 
 interface QuestionCardProps {
   question: SingleChoiceQuestion | MultipleChoiceQuestion | TrueFalseQuestion | MatchingQuestion
@@ -49,11 +49,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
   const options = useMemo(() => {
     if (type === "trueFalse") return ["A", "B"]
-    
+
     if (type === "matching") {
       return Object.keys(parsedMatchingOptions).sort()
     }
-    
+
     // Generate options dynamically (A, B, C, D, E, F...)
     // Checks which keys exist in the question object
     const possibleOptions = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))
@@ -71,34 +71,34 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   }, [type, question.答案]);
 
   const isCorrect = useMemo(() => {
-      if (type === 'multiple') {
-          return selectedAnswer === normalizedCorrectAnswer
-      }
-      // For true/false, single choice and matching
-      // If selected answer is the raw answer (like "√"), normalize it for comparison
-      let normalizedSelected = selectedAnswer;
-      if (type === 'trueFalse') {
-         if (selectedAnswer === '√' || selectedAnswer === '正确') normalizedSelected = 'A';
-         else if (selectedAnswer === '×' || selectedAnswer === '错误') normalizedSelected = 'B';
-      }
-      
-      return normalizedSelected === normalizedCorrectAnswer
+    if (type === 'multiple') {
+      return selectedAnswer === normalizedCorrectAnswer
+    }
+    // For true/false, single choice and matching
+    // If selected answer is the raw answer (like "√"), normalize it for comparison
+    let normalizedSelected = selectedAnswer;
+    if (type === 'trueFalse') {
+      if (selectedAnswer === '√' || selectedAnswer === '正确') normalizedSelected = 'A';
+      else if (selectedAnswer === '×' || selectedAnswer === '错误') normalizedSelected = 'B';
+    }
+
+    return normalizedSelected === normalizedCorrectAnswer
   }, [selectedAnswer, normalizedCorrectAnswer, type])
 
   const showResultFeedback = submitted && selectedAnswer
 
   const getOptionStyle = (option: string) => {
     let isSelected = false;
-    
+
     if (type === "multiple") {
-        isSelected = selectedAnswer?.includes(option) || false;
+      isSelected = selectedAnswer?.includes(option) || false;
     } else if (type === "trueFalse") {
-        // Handle cases where selectedAnswer might be passed as "√" (from search page) or "A" (from user click)
-        if (selectedAnswer === '√' || selectedAnswer === '正确') isSelected = option === 'A';
-        else if (selectedAnswer === '×' || selectedAnswer === '错误') isSelected = option === 'B';
-        else isSelected = selectedAnswer === option;
+      // Handle cases where selectedAnswer might be passed as "√" (from search page) or "A" (from user click)
+      if (selectedAnswer === '√' || selectedAnswer === '正确') isSelected = option === 'A';
+      else if (selectedAnswer === '×' || selectedAnswer === '错误') isSelected = option === 'B';
+      else isSelected = selectedAnswer === option;
     } else {
-        isSelected = selectedAnswer === option;
+      isSelected = selectedAnswer === option;
     }
 
     const isCorrectOption = normalizedCorrectAnswer.includes(option)
@@ -303,13 +303,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         {submitted && (
           <>
             <div
-              className={`p-3 rounded-lg ${
-                showResultFeedback
-                  ? isCorrect
-                    ? "bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-100"
-                    : "bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-100"
-                  : "bg-blue-50 dark:bg-blue-950/30 text-blue-800 dark:text-blue-100"
-              }`}
+              className={`p-3 rounded-lg ${showResultFeedback
+                ? isCorrect
+                  ? "bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-100"
+                  : "bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-100"
+                : "bg-blue-50 dark:bg-blue-950/30 text-blue-800 dark:text-blue-100"
+                }`}
             >
               {showResultFeedback && <p className="font-medium">{isCorrect ? "正确" : "错误"}</p>}
               <p className={showResultFeedback ? "text-sm mt-1" : "font-medium"}>

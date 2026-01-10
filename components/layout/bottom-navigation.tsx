@@ -42,7 +42,7 @@ const navigationItems = [
 export function BottomNavigation() {
   const pathname = usePathname()
 
-  if (pathname === "/new-year") {
+  if (pathname === "/new-year" || pathname === "/feedback") {
     return null
   }
 
@@ -73,15 +73,15 @@ export function BottomNavigation() {
                   }}
                 />
               )}
-              
+
               <div className="relative z-10 flex flex-col items-center gap-1">
                 <div className="relative">
-                  <Icon 
+                  <Icon
                     className={cn(
-                      "w-6 h-6 transition-all duration-500 ease-out", 
-                      isActive && "fill-current scale-110 drop-shadow-sm" 
-                    )} 
-                    strokeWidth={isActive ? 2.5 : 2} 
+                      "w-6 h-6 transition-all duration-500 ease-out",
+                      isActive && "fill-current scale-110 drop-shadow-sm"
+                    )}
+                    strokeWidth={isActive ? 2.5 : 2}
                   />
                   {isActive && (
                     <motion.div

@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { useSubject } from "@/components/subject-provider"
-import { QuestionCard } from "@/components/question-card"
+import { useSubject } from "@/components/providers/subject-provider"
+import { QuestionCard } from "@/components/features/exam/question-card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Search as SearchIcon, ChevronLeft, Home } from "lucide-react"
@@ -26,7 +26,7 @@ export default function SearchPage() {
     if (!searchTerm.trim()) return []
     // Split by space and filter out empty strings
     const terms = searchTerm.toLowerCase().split(/\s+/).filter(Boolean)
-    
+
     if (terms.length === 0) return []
 
     return allQuestions.filter(q => {
@@ -85,7 +85,7 @@ export default function SearchPage() {
                 questionNumber={idx + 1}
                 totalQuestions={filteredQuestions.length}
                 type={q.type}
-                onAnswerSelect={() => {}}
+                onAnswerSelect={() => { }}
                 selectedAnswer={q.答案}
                 submitted={true}
                 showComments={false}

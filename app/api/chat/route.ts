@@ -5,7 +5,7 @@ import crypto from 'crypto';
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
-    const apiKey = 'YOUR_DEEPSEEK_API_KEY';
+    const apiKey = process.env.DEEPSEEK_API_KEY;
 
     // 1. 生成缓存 Key (MD5 hash of messages)
     const questionText = JSON.stringify(messages);

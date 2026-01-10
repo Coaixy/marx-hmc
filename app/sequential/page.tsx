@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { QuestionCard } from "@/components/question-card"
+import { QuestionCard } from "@/components/features/exam/question-card"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
@@ -10,8 +10,8 @@ import { Label } from "@/components/ui/label"
 import { getSequentialQuestion, getTotalQuestions } from "@/lib/question-utils"
 import { storage } from "@/lib/storage"
 import { ChevronLeft, ChevronRight, Home, Eye, EyeOff, CheckCircle } from "lucide-react"
-import { AnswerSheet } from "@/components/answer-sheet"
-import { useSubject } from "@/components/subject-provider"
+import { AnswerSheet } from "@/components/features/exam/answer-sheet"
+import { useSubject } from "@/components/providers/subject-provider"
 
 export default function SequentialPage() {
   const { subjectId, subject } = useSubject()
@@ -27,7 +27,7 @@ export default function SequentialPage() {
   useEffect(() => {
     setMounted(true)
     const progress = storage.getProgress(subjectId)
-    
+
     // Default to 'single' if available, otherwise try others
     let initialMode: "single" | "multiple" | "trueFalse" | "matching" = "single"
     if (single === 0) {
@@ -46,7 +46,7 @@ export default function SequentialPage() {
     } else {
       setQuestionIndex(progress.matchingIndex)
     }
-    
+
     // Reset state
     setSelectedAnswer("")
     setSubmitted(isReciteMode)
@@ -179,13 +179,13 @@ export default function SequentialPage() {
   }
 
   const getModeLabel = () => {
-      switch (mode) {
-          case "single": return "单选题"
-          case "multiple": return "多选题"
-          case "trueFalse": return "判断题"
-          case "matching": return "匹配题"
-          default: return ""
-      }
+    switch (mode) {
+      case "single": return "单选题"
+      case "multiple": return "多选题"
+      case "trueFalse": return "判断题"
+      case "matching": return "匹配题"
+      default: return ""
+    }
   }
 
   return (
@@ -201,21 +201,21 @@ export default function SequentialPage() {
           <div className="text-center">
             <h1 className="font-semibold text-primary">背题模式</h1>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-border">
-               <Label htmlFor="recite-mode" className="text-xs font-medium cursor-pointer flex items-center gap-1.5">
-                  {isReciteMode ? <Eye className="w-3.5 h-3.5 text-primary" /> : <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />}
-                  <span className={isReciteMode ? "text-primary" : "text-muted-foreground"}>
-                    {isReciteMode ? "背题" : "做题"}
-                  </span>
-               </Label>
-               <Switch
-                  id="recite-mode"
-                  checked={isReciteMode}
-                  onCheckedChange={setIsReciteMode}
-                  className="scale-75 data-[state=checked]:bg-primary"
-               />
+              <Label htmlFor="recite-mode" className="text-xs font-medium cursor-pointer flex items-center gap-1.5">
+                {isReciteMode ? <Eye className="w-3.5 h-3.5 text-primary" /> : <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />}
+                <span className={isReciteMode ? "text-primary" : "text-muted-foreground"}>
+                  {isReciteMode ? "背题" : "做题"}
+                </span>
+              </Label>
+              <Switch
+                id="recite-mode"
+                checked={isReciteMode}
+                onCheckedChange={setIsReciteMode}
+                className="scale-75 data-[state=checked]:bg-primary"
+              />
             </div>
             <AnswerSheet
               total={maxQuestions}
@@ -259,7 +259,7 @@ export default function SequentialPage() {
               判断题
             </Button>
           )}
-           {matching > 0 && (
+          {matching > 0 && (
             <Button
               variant={mode === "matching" ? "default" : "outline"}
               size="sm"
@@ -295,15 +295,15 @@ export default function SequentialPage() {
             >
               <ChevronLeft className="w-4 h-4 mr-2" /> 上一题
             </Button>
-            
+
             {!isReciteMode && !submitted && (
-                <Button 
-                    onClick={handleSubmit} 
-                    disabled={!selectedAnswer} 
-                    className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30"
-                >
-                    <CheckCircle className="w-4 h-4 mr-2" /> 提交
-                </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={!selectedAnswer}
+                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" /> 提交
+              </Button>
             )}
 
             <Button onClick={handleNext} disabled={questionIndex + 1 >= maxQuestions} className="flex-1">

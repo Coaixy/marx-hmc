@@ -2,20 +2,20 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { QuestionCard } from "@/components/question-card"
+import { QuestionCard } from "@/components/features/exam/question-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { storage } from "@/lib/storage"
 import { getQuestionBank } from "@/lib/question-data"
 import { ChevronLeft, Trash2, Home } from "lucide-react"
-import { useSubject } from "@/components/subject-provider"
+import { useSubject } from "@/components/providers/subject-provider"
 
 export default function ErrorsPage() {
   const { subjectId, subject } = useSubject()
   const [wrongAnswers, setWrongAnswers] = useState(() => storage.getWrongAnswers(subjectId))
   const [selectedId, setSelectedId] = useState<string>()
   const [filter, setFilter] = useState<"all" | "single" | "multiple" | "trueFalse">("all")
-  
+
   // Reload when subject changes
   useEffect(() => {
     const answers = storage.getWrongAnswers(subjectId)
@@ -37,7 +37,7 @@ export default function ErrorsPage() {
   const selectedAnswer = filteredAnswers.find((a) => a.id === selectedId)
 
   const bank = getQuestionBank(subjectId)
-  
+
   const getQuestionContent = (type: string, index: number) => {
     // Add bounds checking to prevent index out of range errors
     if (index < 0) return null
@@ -51,19 +51,19 @@ export default function ErrorsPage() {
       return index < questions.length ? questions[index] : null
     }
     if (type === "trueFalse") {
-        const questions = bank.判断题 || []
-        const q = questions[index]
-        if (!q || index >= questions.length) return null
-        return {
-            ...q,
-            答案: q.答案 === "√" ? "A" : "B",
-            A: "√",
-            B: "×",
-            C: "",
-            D: "",
-            章节: "",
-            难度: ""
-        }
+      const questions = bank.判断题 || []
+      const q = questions[index]
+      if (!q || index >= questions.length) return null
+      return {
+        ...q,
+        答案: q.答案 === "√" ? "A" : "B",
+        A: "√",
+        B: "×",
+        C: "",
+        D: "",
+        章节: "",
+        难度: ""
+      }
     }
     if (type === "matching") {
       const questions = bank.匹配题 || []
@@ -77,7 +77,7 @@ export default function ErrorsPage() {
   const handleDelete = (id: string) => {
     const currentIndex = filteredAnswers.findIndex((a) => a.id === id)
     let nextId = ""
-    
+
     if (filteredAnswers.length > 1) {
       if (currentIndex < filteredAnswers.length - 1) {
         nextId = filteredAnswers[currentIndex + 1].id
@@ -179,7 +179,7 @@ export default function ErrorsPage() {
               questionNumber={filteredAnswers.findIndex((a) => a.id === selectedId) + 1}
               totalQuestions={filteredAnswers.length}
               type={selectedAnswer?.type || "single"}
-              onAnswerSelect={() => {}}
+              onAnswerSelect={() => { }}
               selectedAnswer={selectedAnswer?.userAnswer}
               submitted={true}
             />
@@ -195,28 +195,28 @@ export default function ErrorsPage() {
         ) : (
           <div className="space-y-2 mb-4">
             {filteredAnswers.map((answer, idx) => {
-                const qContent = getQuestionContent(answer.type, answer.questionIndex)
-                return (
-                  <button
-                    key={answer.id}
-                    onClick={() => setSelectedId(answer.id)}
-                    className="w-full p-3 text-left rounded-lg border border-border hover:border-primary/50 transition-colors bg-card"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <p className="font-semibold text-sm">
-                          {answer.type === "single" ? "单选题" : answer.type === "multiple" ? "多选题" : answer.type === "trueFalse" ? "判断题" : answer.type === "matching" ? "匹配题" : "未知题型"} {idx + 1}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                          {qContent?.题干 || "题目加载失败或已更新"}
-                        </p>
-                      </div>
-                      <span className="text-xs bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 px-2 py-1 rounded ml-2 shrink-0">
-                        错误
-                      </span>
+              const qContent = getQuestionContent(answer.type, answer.questionIndex)
+              return (
+                <button
+                  key={answer.id}
+                  onClick={() => setSelectedId(answer.id)}
+                  className="w-full p-3 text-left rounded-lg border border-border hover:border-primary/50 transition-colors bg-card"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">
+                        {answer.type === "single" ? "单选题" : answer.type === "multiple" ? "多选题" : answer.type === "trueFalse" ? "判断题" : answer.type === "matching" ? "匹配题" : "未知题型"} {idx + 1}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                        {qContent?.题干 || "题目加载失败或已更新"}
+                      </p>
                     </div>
-                  </button>
-                )
+                    <span className="text-xs bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 px-2 py-1 rounded ml-2 shrink-0">
+                      错误
+                    </span>
+                  </div>
+                </button>
+              )
             })}
           </div>
         )}

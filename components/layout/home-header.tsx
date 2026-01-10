@@ -2,7 +2,7 @@
 
 import { Megaphone, Check, Pencil, ChevronDown } from "lucide-react"
 import { SUBJECTS, type SubjectId } from "@/lib/question-data"
-import { useSubject } from "@/components/subject-provider"
+import { useSubject } from "@/components/providers/subject-provider"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"

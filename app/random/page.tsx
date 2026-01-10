@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { QuestionCard } from "@/components/question-card"
+import { QuestionCard } from "@/components/features/exam/question-card"
 import { Button } from "@/components/ui/button"
 import { getTotalQuestions, getSequentialQuestion } from "@/lib/question-utils"
 import { storage, type RandomProgress } from "@/lib/storage"
 import { ChevronLeft, Shuffle, Home, RotateCcw } from "lucide-react"
-import { useSubject } from "@/components/subject-provider"
+import { useSubject } from "@/components/providers/subject-provider"
 
 // Fisher-Yates shuffle
 function shuffleArray(array: number[]) {
@@ -34,7 +34,7 @@ export default function RandomPage() {
 
   useEffect(() => {
     setMounted(true)
-    
+
     // Try to load saved progress
     const saved = storage.getRandomProgress(subjectId)
     if (saved) {
@@ -54,7 +54,7 @@ export default function RandomPage() {
         else if (matching > 0) initialMode = "matching"
       }
       setMode(initialMode)
-      
+
       const totalForMode = totals[initialMode === "trueFalse" ? "trueFalse" : initialMode === "matching" ? "matching" : initialMode]
       const indices = shuffleArray(Array.from({ length: totalForMode }, (_, i) => i))
       setShuffledIndices(indices)
@@ -62,7 +62,7 @@ export default function RandomPage() {
 
       const qIndex = indices[0]
       const question = getSequentialQuestion(subjectId, initialMode, qIndex)
-      
+
       setCurrentQuestion(question ? { question, index: qIndex } : null)
       setSelectedAnswer("")
       setSubmitted(false)
@@ -70,11 +70,11 @@ export default function RandomPage() {
     }
   }, [subjectId]) // Only re-run when subject changes
 
-  
+
   // Save progress whenever it changes
   useEffect(() => {
     if (!mounted || !currentQuestion) return
-    
+
     const progress: RandomProgress = {
       count,
       mode,
@@ -163,7 +163,7 @@ export default function RandomPage() {
 
   const handleModeChange = (newMode: "single" | "multiple" | "trueFalse" | "matching") => {
     setMode(newMode)
-    
+
     const totalForMode = totals[newMode === "trueFalse" ? "trueFalse" : newMode === "matching" ? "matching" : newMode]
     const indices = shuffleArray(Array.from({ length: totalForMode }, (_, i) => i))
     setShuffledIndices(indices)
@@ -198,13 +198,13 @@ export default function RandomPage() {
   }
 
   const getTotalForMode = () => {
-      switch (mode) {
-          case "single": return single;
-          case "multiple": return multiple;
-          case "trueFalse": return trueFalse;
-          case "matching": return matching;
-          default: return 0;
-      }
+    switch (mode) {
+      case "single": return single;
+      case "multiple": return multiple;
+      case "trueFalse": return trueFalse;
+      case "matching": return matching;
+      default: return 0;
+    }
   }
 
   return (
