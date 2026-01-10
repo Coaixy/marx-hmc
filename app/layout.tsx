@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono, Noto_Sans_SC } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { BottomNavigation } from "@/components/bottom-navigation"
+import { ExamInterceptor } from "@/components/exam-interceptor"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
@@ -44,9 +45,11 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className={`${_geist.variable} ${_geistMono.variable} ${_notoChinese.variable} font-sans antialiased min-h-screen pb-20`}>
         <SubjectProvider>
-          {children}
-          <BottomNavigation />
-          <Toaster />
+          <ExamInterceptor>
+            {children}
+            <BottomNavigation />
+            <Toaster />
+          </ExamInterceptor>
         </SubjectProvider>
         <Analytics />
       </body>
