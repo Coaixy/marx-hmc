@@ -43,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={`${_geist.variable} ${_geistMono.variable} ${_notoChinese.variable} font-sans antialiased min-h-screen pb-20`}>
+      <body className={`${_geist.className} ${_geistMono.className} ${_notoChinese.className} font-sans antialiased min-h-screen pb-20`}>
         <SubjectProvider>
           <ExamInterceptor>
             {children}

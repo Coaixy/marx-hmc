@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useState, useEffect } from "react"
 import type { SingleChoiceQuestion, MultipleChoiceQuestion, TrueFalseQuestion, MatchingQuestion } from "@/lib/question-data"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -39,6 +39,13 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   showComments = true,
 }) => {
   const [copied, setCopied] = useState(false)
+  const [canShare, setCanShare] = useState(false)
+
+  useEffect(() => {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      setCanShare(true)
+    }
+  }, [])
 
   const parsedMatchingOptions = useMemo(() => {
     if (type === "matching") {
@@ -261,7 +268,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                     </>
                   )}
                 </DropdownMenuItem>
-                {navigator.share && (
+                {canShare && (
                   <DropdownMenuItem onClick={handleShare} className="cursor-pointer gap-2">
                     <Share2 className="w-4 h-4" />
                     <span>分享到...</span>
